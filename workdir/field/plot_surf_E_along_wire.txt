@@ -1,0 +1,5 @@
+//  surface plot along wire
+area -0.4 -0.4 -0.4 0.4 0.4 0.4 ...
+    view y=0 cut rot 90
+grid 25
+pl surface e

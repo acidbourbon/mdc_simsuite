@@ -1,0 +1,15 @@
+{
+       "sense_angle_deg":0,
+       "layer_pitch"       :2.5e-3 ,
+       "cathode_pitch"     :2e-3  ,
+       "sense_field_pitch" :2.5e-3  ,
+       "field_wire_rad"       : 40e-6 ,
+       "cath_wire_rad"        : 40e-6 ,
+       "sense_wire_rad"       : 10e-6 ,
+       "v_cath"      :-1750,
+       "v_field"     :-1750,
+       "v_sense"     : 0    ,
+       "sim_vol_xsize":30e-3,
+       "sim_vol_ysize":30e-3,
+       "sim_vol_zsize":30e-3
+}

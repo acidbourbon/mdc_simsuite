@@ -1,0 +1,5 @@
+//  surface plot cross section
+area -0.6 -0.6 -0.6 0.6 0.6 0.6 ...
+    view x=0 cut rot 90
+grid 50
+pl surface e

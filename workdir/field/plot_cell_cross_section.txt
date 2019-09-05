@@ -1,0 +1,5 @@
+//  plot cross section
+area -0.6 -0.6 -0.6 0.6 0.6 0.6 ...
+    view x=0 cut rot 90
+Call plot_field_area
+Call plot_end
