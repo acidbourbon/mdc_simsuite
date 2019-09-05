@@ -13,7 +13,10 @@ def dump(obj):
 def create_empty_conf():
   write_conf_json({
     "selected_cell" : None,
-    "field_options" : []
+    "field_options" : [],
+    "magnetic_options" : [],
+    "drift_options" : [],
+    "gas_options" : []
     #"cells" : [{"name":"dummy","conf":{}}]
     })
 
@@ -41,6 +44,36 @@ def set_field_options(options):
   conf = get_conf_json()
   conf["field_options"] = options
   write_conf_json(conf)
+  
+def get_magnetic_options():
+  conf = get_conf_json()
+  return conf["magnetic_options"]
+
+def set_magnetic_options(options):
+  conf = get_conf_json()
+  conf["magnetic_options"] = options
+  write_conf_json(conf)
+  
+def get_drift_options():
+  conf = get_conf_json()
+  return conf["drift_options"]
+
+def set_drift_options(options):
+  conf = get_conf_json()
+  conf["drift_options"] = options
+  write_conf_json(conf)
+  
+def get_gas_options():
+  conf = get_conf_json()
+  return conf["gas_options"]
+
+def set_gas_options(options):
+  conf = get_conf_json()
+  conf["gas_options"] = options
+  write_conf_json(conf)
+  
+  
+  
 
 def get_conf_json():
   if ( os.path.isfile(root_dir+"/"+conf_file) == False ) :
@@ -72,7 +105,7 @@ def get_cell_conf(name):
   
   
   if name in list_cells():
-    return get_file_json(cells_dir+"/"+name+".json")
+    return get_file_json(cells_dir+"/"+name)
   ## could not find it
   raise NameError("could not find cell with name {:s}".format(name))
 
@@ -83,7 +116,7 @@ def list_dir(dir,**kwargs):
   names = [] 
   for file in files:
     if ext in file:
-      names += [file.replace(ext,"") ]
+      names += [file]
     
   names.sort()
   return names

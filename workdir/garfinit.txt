@@ -1,0 +1,197 @@
+* --------------------------------------------------------------------------- *
+* Sample initialisation file for Garfield.                                    *
+*                                                                             *
+* This file is suitable for displaying plots on a screen, not for making      *
+* colour transparencies nor for making plots to be used in a paper.           *
+*                                                                             *
+* The colours from Brown to Purple are used for surface plotting. The         *
+* representations can be modified freely. This file can be speeded up         *
+* considerably by storing the various representations in a file.              *
+*                                                                             *
+* (Last changed on 31/ 3/08.)                                                 *
+* --------------------------------------------------------------------------- *
+Say "You are running {input} on {machine}."
+* --------------------------------------------------------------------------- *
+* Some global variables to be used for inquiries.                             *
+* --------------------------------------------------------------------------- *
+Global yes=true
+Global y=true
+Global no=false
+Global n=false
+* --------------------------------------------------------------------------- *
+* Define a series of colours.                                                 *
+* --------------------------------------------------------------------------- *
+!col white       red 1    blue 1    green 1
+!col light-grey  red 0.75 blue 0.75 green 0.75
+!col medium-grey red 0.5  blue 0.5  green 0.5
+!col dark-grey   red 0.25 blue 0.25 green 0.25
+!col black       red 0    blue 0    green 0
+!col brown       red 0.4  blue 0    green 0
+!col red         red 1    blue 0    green 0
+!col orange      red 1    blue 0    green 0.7
+!col yellow      red 1    blue 0    green 0.95
+!col cream       red 1    blue 0.8  green 1
+!col green       red 0    blue 0    green 1
+!col copper      red 0.2  blue 0.2  green 0.7
+!col dark-green  red 0    blue 0    green 0.5
+!col blue        red 0    blue 1    green 0
+!col light-blue  red 0.7  blue 1    green 0.9
+!col light-pink  red 1    blue 1    green 0.8
+!col pink        red 1    blue 0.7  green 0
+!col purple      red 0.7  blue 1    green 0
+* --------------------------------------------------------------------------- *
+* Find out whether the plots have to be in colour or not.                     *
+* (Uncomment these lines if you wish to be asked.)                            *
+* --------------------------------------------------------------------------- *
+Global colour True
+*Say "Would you like your plots in colour ? (YES/no)"
+*Parse Evaluate Terminal colour
+*Call inquire_type(colour,type)
+*If 'type#`Logical`' Then
+*   Say "Invalid reply, assuming you wish to have colour plots."
+*   Global colour=true
+*Endif
+* --------------------------------------------------------------------------- *
+* Appearance of various elements.                                             *
+* --------------------------------------------------------------------------- *
+If colour Then
+   !rep box            polyline-colour   black      linewidth-scale 3
+   !rep box            fill-area-inter   solid      fill-area-col   cream
+   !rep grid           polyline-colour   light-grey linewidth-scale 3
+   !rep labels         text-colour       black      text-font       higz
+   !rep numbers        text-colour       black      text-font       higz
+   !rep title          text-colour       black      text-font       higz
+   !rep comment        text-colour       black      text-font       higz
+   !rep comment        polyline-colour   dark-green linewidth-scale 1
+   !rep message        text-colour       foreground text-font       higz
+   !rep planes         polyline-colour   brown      linewidth-scale 3
+   !rep planes         fill-area-inter   solid      fill-area-col   light-grey 
+   !rep strips         polyline-colour   red        linewidth-scale 5
+   !rep strips         fill-area-inter   solid      fill-area-col   red
+   !rep tube           polyline-colour   brown      linewidth-scale 3
+   !rep tube           fill-area-inter   solid      fill-area-col   light-grey 
+   !rep s-wire         polymarker-colour brown      marker-type     plus
+   !rep c-wire         polymarker-colour brown      marker-type     circle
+   !rep p-wire         polymarker-colour brown      marker-type     cross
+   !rep other-wire     polymarker-colour brown      marker-type     asterisk
+   !rep wires          fill-area-inter   solid      fill-area-col   purple
+   !rep dielectrica-1  fill-area-inter   solid      fill-area-col   yellow 
+   !rep dielectrica-2  fill-area-inter   solid      fill-area-col   light-blue
+   !rep dielectrica-3  fill-area-inter   solid      fill-area-col   pink
+   !rep conductors-1   fill-area-inter   solid      fill-area-col   copper 
+   !rep conductors-2   fill-area-inter   solid      fill-area-col   purple
+   !rep conductors-3   fill-area-inter   solid      fill-area-col   brown
+   !rep outline        linetype          solid      polyline-col    brown
+   !rep outside-area   fill-area-colour  light-blue fill-area-inter hatch ...
+                       fill-area-style   365
+   !rep error-bar      fill-area-inter   solid      fill-area-col   light-pink
+   !rep error-bar      polyline-colour   purple     linetype        solid
+   !rep error-band     fill-area-inter   solid      fill-area-col   yellow
+   !rep error-band     polyline-colour   orange     linetype        solid
+   !rep contour-label  text-colour       orange     text-font       higz
+   !rep contour-normal polyline-colour   copper                              
+   !rep contour-high   polyline-colour   red        linewidth-scale 3
+   !rep track          polyline-colour   yellow     linewidth-scale 3 ...
+                       linetype          solid
+   !rep track          polymarker-colour yellow     marker-type     cross
+   !rep delta-electron polyline-colour   copper     linewidth-scale 3 ...
+                       linetype          solid
+   !rep delta-electron polymarker-colour copper     marker-type     circle ...
+                       marker-size       0.5
+   !rep auger-electron polyline-colour   purple     linewidth-scale 3 ...
+                       linetype          solid
+   !rep auger-electron polymarker-colour purple     marker-type     circle ...
+                       marker-size       0.5
+   !rep barchart-1     fill-area-col     orange     fill-area-inter solid
+   !rep barchart-2     fill-area-col     dark-green fill-area-inter solid
+   !rep barchart-3     fill-area-col     blue       fill-area-inter solid
+   !rep barchart-4     fill-area-col     purple     fill-area-inter solid
+   !rep barchart-5     fill-area-col     red        fill-area-inter solid
+   !rep barchart-6     fill-area-col     brown      fill-area-inter solid
+   !rep barchart-7     fill-area-col     black      fill-area-inter solid
+   !rep photon         polyline-colour   red        linewidth-scale 3 ...
+                       linetype          solid
+   !rep photon         polymarker-colour red        marker-type     circle ...
+                       marker-size       0.5
+   !rep drift-line     polyline-colour   orange     linewidth-scale 3
+   !rep e-drift-line   polyline-colour   orange     linewidth-scale 3
+   !rep ion-drift-line polyline-colour   red        linewidth-scale 3
+   !rep isochron       polyline-colour   copper     linewidth-scale 3
+   !rep isochron       polymarker-colour copper     marker-type     plus
+   !rep function-1     polyline-colour   orange     linetype        solid ...
+                       linewidth-scale   3
+   !rep function-1     polymarker-colour orange     marker-type     circle
+   !rep function-1     text-colour       orange     text-font       times-roman
+   !rep function-1     fill-area-col     orange     fill-area-inter solid
+   !rep function-2     polyline-colour   dark-green linetype        solid ...
+                       linewidth-scale   3
+   !rep function-2     polymarker-colour dark-green marker-type     circle
+   !rep function-2     text-colour       dark-green text-font       times-roman
+   !rep function-2     fill-area-col     dark-green fill-area-inter solid
+   !rep function-3     polyline-colour   blue       linetype        solid ...
+                       linewidth-scale   3
+   !rep function-3     polymarker-colour blue       marker-type     circle
+   !rep function-3     text-colour       blue       text-font       times-roman
+   !rep function-3     fill-area-col     blue       fill-area-inter solid
+   !rep function-4     polyline-colour   purple     linetype        solid ...
+                       linewidth-scale   3
+   !rep function-4     polymarker-colour purple     marker-type     circle
+   !rep function-4     text-colour       purple     text-font       times-roman
+   !rep function-4     fill-area-col     purple     fill-area-inter solid
+   !rep function-5     polyline-colour   red        linetype        solid ...
+                       linewidth-scale   3
+   !rep function-5     polymarker-colour red        marker-type     circle
+   !rep function-5     text-colour       red        text-font       times-roman
+   !rep function-5     fill-area-col     red        fill-area-inter solid
+   !rep function-6     polyline-colour   brown      linetype        solid ...
+                       linewidth-scale   3
+   !rep function-6     polymarker-colour brown      marker-type     circle
+   !rep function-6     text-colour       brown      text-font       times-roman
+   !rep function-6     fill-area-col     brown      fill-area-inter solid
+   !rep function-7     polyline-colour   black      linetype        solid ...
+                       linewidth-scale   3
+   !rep function-7     polymarker-colour black      marker-type     circle
+   !rep function-7     text-colour       black      text-font       times-roman
+   !rep function-7     fill-area-col     black      fill-area-inter solid
+   !rep histogram-1    polyline-colour   orange     linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-2    polyline-colour   dark-green linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-3    polyline-colour   blue       linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-4    polyline-colour   purple     linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-5    polyline-colour   red        linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-6    polyline-colour   brown      linetype        solid ...
+                       linewidth-scale   3
+   !rep histogram-7    polyline-colour   black      linetype        solid ...
+                       linewidth-scale   3
+   !rep material-1     fill-area-inter   solid      fill-area-col   yellow
+   !rep material-2     fill-area-inter   solid      fill-area-col   green
+   !rep material-3     fill-area-inter   solid      fill-area-col   cream
+   !rep material-4     fill-area-inter   solid      fill-area-col   light-pink
+   !rep material-5     fill-area-inter   solid      fill-area-col   light-blue
+   !rep elastic        polymarker-colour cream      marker-type     circle ...
+                       marker-size       0.2
+   !rep inelastic      polymarker-colour yellow     marker-type     circle ...
+                       marker-size       0.2
+   !rep excitation     polymarker-colour brown      marker-type     circle ...
+                       marker-size       0.2
+   !rep super-elastic  polymarker-colour purple     marker-type     circle ...
+                       marker-size       0.2
+   !rep ionisation     polymarker-colour red        marker-type     circle ...
+                       marker-size       0.2
+   !rep attachment     polymarker-colour blue       marker-type     circle ...
+                       marker-size       0.2
+Endif
+* --------------------------------------------------------------------------- *
+* Other graphics options.                                                     *
+* --------------------------------------------------------------------------- *
+!opt grid
+* --------------------------------------------------------------------------- *
+* Choice of shell, translation tables, global options etc.                    *
+* --------------------------------------------------------------------------- *
+* shell "tcsh"
+* trans
+opt on-error-skip

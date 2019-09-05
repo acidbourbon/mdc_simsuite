@@ -1,7 +1,13 @@
 {
-  "field_options": [
-    "plot_cell_cross_section",
-    "view_cell_3d"
+  "drift_options": [
+    "100_MIPS.sh"
   ],
-  "selected_cell": "MDC1"
+  "field_options": [
+    "view_inner_cube_3d.txt"
+  ],
+  "gas_options": "ar70_co230.txt",
+  "magnetic_options": [
+    "0T.txt"
+  ],
+  "selected_cell": "MDC1.json"
 }

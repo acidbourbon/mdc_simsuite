@@ -26,13 +26,18 @@ while True:
   if mm_tag == "":
     code, tag = d.menu("main menu", height="30", menu_height="28",
       choices = [
-                 ("","---     CELL      ---"),
+                 ("","---   CELL       ---"),
                  ("01","selected: {:s}".format(conf.get_selected_cell())),
+                 ("","---   FIELD      ---"),
+                 ("02","set field options"),
+                 ("","---   MAGNETIC   ---"),
+                 ("06","set magnetic options"),
+                 ("","---   GAS        ---"),
+                 ("08","select gas"),
+                 ("","---   DRIFT      ---"),
+                 ("07","set drift options"),
                  ("",""),
-                 ("","---     FIELD     ---"),
-                 ("02","set plot options"),
-                 ("",""),
-                 ("","---  run GARFIELD ---"),
+                 ("","--- run GARFIELD ---"),
                  ("03","run with graphics output"),
                  ("04","run w/o graphics"),
                  ("05","only create garfield_in.txt"),
@@ -61,14 +66,15 @@ while True:
       if code == d.OK:
         name = tag
         conf.set_selected_cell(name)
-        #cell_conf = conf.get_cell_conf(cell_name)
-        #d.infobox("", width=0, height=0, title="This is the end")
-        #time.sleep(1)
+        
     if tag == "02":
       dialog_field_checklist()
-      #print(selection)
-      #d.infobox(conf.dump(selection), width=0, height=0, title="")
-      #time.sleep(2)
+    if tag == "06":
+      dialog_magnetic_checklist()
+    if tag == "07":
+      dialog_drift_checklist()
+    if tag == "08":
+      dialog_gas_checklist()
     
     #if tag == "01":
       

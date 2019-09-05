@@ -1,0 +1,18 @@
+*****************GAS************************
+&gas
+gas-id "ar/co2 82/18"
+global gas_file `gas/ar_co282-18-293-760.dat`
+temperature 293
+pressure 760
+Call inquire_file(gas_file,exist)
+If exist Then
+Say "Gas file exists, retrieving ..."
+get {gas_file}
+Else
+Say "Gas file not found, generating ..."
+magboltz argon 82. carbon-dioxide 18. mobility 1.000000
+write dataset "gas/ar_co282-18-293-760.dat" gasdata remark "magboltz-ar82-co218"
+Endif
+heed argon 82. carbon-dioxide 18.
+
+
