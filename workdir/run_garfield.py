@@ -92,7 +92,9 @@ def run_garfield(**kwargs):
   
   # call garfield
   if(not(dryrun)):
-    os.system("export LD_LIBRARY_PATH=\"./\"; ./garfield-9 < garfield_in.txt | tee garfield_out.txt")
+    #os.system("export LD_LIBRARY_PATH=\"./\"; ./garfield-9 < garfield_in.txt | tee garfield_out.txt")
+    print("starting garfield, reading garfield_in.txt")
+    os.system("export LD_LIBRARY_PATH=\"./\"; ./garfield-9 < garfield_in.txt | ./slurp_garfield_out.py")
 
   # view graphical output
   if show_graphics:

@@ -84,6 +84,7 @@ hit_pattern = re.compile(
 
 data["evt"][0] = -1
 
+electrons = 0
 
 for line in sys.stdin:
   
@@ -92,7 +93,8 @@ for line in sys.stdin:
   match = re.search(track_start_pattern, line)
   if match:
     data["evt"][0] = data["evt"][0]+1
-    print("track start")
+    print("\nnew track, event no {:d}".format(data["evt"][0]))
+    electrons = 0
     #print(match.groups())
     # convert from cm to m
     data["track_start_x"][0] = 1e-2*float(match.groups()[0])
@@ -102,7 +104,7 @@ for line in sys.stdin:
     
   match = re.search(track_end_pattern, line)
   if match:
-    print("track end")
+    #print("track end")
     #print(match.groups())
     # convert from cm to m
     data["track_end_x"][0] = 1e-2*float(match.groups()[0])
@@ -124,6 +126,8 @@ for line in sys.stdin:
     data["e_drift_t"][0] = 1e-6*float(match.groups()[3])
     data["hit_wire"][0]  =   int(match.groups()[4])
     #print("hit wire: {:d}".format(data["hit_wire"][0]))
+    electrons += 1
+    print("got {:d} electrons".format(electrons)+" "*20+"\r", end=" ")
     
     data_tree.Fill()
 
