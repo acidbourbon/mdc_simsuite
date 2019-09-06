@@ -5,7 +5,7 @@ temp=$(mktemp)
 
 ## options for track generator as env variables
 export outfile=$temp
-export number=20
+export number=10
 export z_length=0.016 # m - track length in z
 export displacement_x=0.001  # m - simulate uniform track distribution between +-displacement_x
 export displacement_y=0.0025 # m - simulate uniform track distribution between +-displacement_y

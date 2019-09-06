@@ -138,6 +138,23 @@ def dialog_gas_checklist():
   else:
     d.infobox("no option files in ./gas", width=0, height=0, title="done")
     time.sleep(2)
+    
+def dialog_ana_menu():
+  d = Dialog(dialog="dialog")
+  d.set_background_title("analysis macros")
+  
+  gas_options = conf.get_gas_options()
+  
+  choices = []
+  
+  for entry in conf.list_dir("./ana",ext=".sh"):
+    choices+= [(entry,"")]
+  for entry in conf.list_dir("./ana",ext=".py"):
+    choices+= [(entry,"")]
+    
+  if len(choices):
+    code, tag = d.menu("select macro to run", choices=choices)
+    return (code,tag)
   
   
   #, width=width, height=height, list_height=list_height)

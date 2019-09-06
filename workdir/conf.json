@@ -1,6 +1,6 @@
 {
   "drift_options": [
-    "cosy_tracks_fish.sh"
+    "cosy_1e5_tracks_fish.sh"
   ],
   "field_options": [
     "view_inner_cube_3d.txt"

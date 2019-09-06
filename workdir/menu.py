@@ -41,6 +41,9 @@ while True:
                  ("03","run with graphics output"),
                  ("04","run w/o graphics"),
                  ("05","only create garfield_in.txt"),
+                 ("",""),
+                 ("","---   analysis   ---"),
+                 ("09","run macro on data"),
                  ("z","exit")] )
     #if code == d.OK:
       #mm_tag = tag
@@ -89,7 +92,13 @@ while True:
       d.infobox("created garfield_in.txt", width=0, height=0, title="done")
       time.sleep(2)
       
-        
+    if tag == "09":
+      while True:
+        code, tag = dialog_ana_menu()
+        if code == d.OK:
+          os.system("./ana/{:s}".format(tag))
+        else:
+          break
       
     if tag == "z":
       exit()

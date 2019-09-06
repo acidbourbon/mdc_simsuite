@@ -146,7 +146,7 @@ for line in sys.stdin:
   ### time to fill the tree with electrons in the order of their arrival
   if "INPGET" in line and electrons > 0:
     e_list = sorted(e_list,key=itemgetter("e_drift_t"))
-    e_number = 0 
+    e_number = {}
     print("got {:d} electrons".format(electrons))
     electrons = 0
     for entry in e_list:
@@ -155,10 +155,17 @@ for line in sys.stdin:
       data["e_start_z"][0] = entry["e_start_z"]
       data["e_drift_t"][0] = entry["e_drift_t"]
       data["hit_wire"][0]  = entry["hit_wire"]
-      data["e_number"][0] = e_number
+      
+      # count electron numbers individually for each wire
+      if entry["hit_wire"] in e_number.keys():
+        e_number[entry["hit_wire"]] += 1
+      else:
+        e_number[entry["hit_wire"]] = 0
+        
+      data["e_number"][0] = e_number[entry["hit_wire"]]
+      
       
       data_tree.Fill()
-      e_number += 1
 
 data_tree.Write()    
 
