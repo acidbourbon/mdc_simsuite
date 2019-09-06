@@ -14,6 +14,7 @@ import re
 from ROOT import TFile, TTree, TH1, TH1F
 from array import array
 import numpy as np
+from operator import itemgetter
 
 
 
@@ -33,6 +34,7 @@ data = {
   "e_start_y":'f',
   "e_start_z":'f',
   "e_drift_t":'f',
+  "e_number":'i',
   "hit_wire":'i',
   "evt":'i'
   }
@@ -86,6 +88,8 @@ data["evt"][0] = -1
 
 electrons = 0
 
+e_list=[]
+
 for line in sys.stdin:
   
   ### find track geometry information
@@ -95,6 +99,7 @@ for line in sys.stdin:
     data["evt"][0] = data["evt"][0]+1
     print("\nnew track, event no {:d}".format(data["evt"][0]))
     electrons = 0
+    e_list = []
     #print(match.groups())
     # convert from cm to m
     data["track_start_x"][0] = 1e-2*float(match.groups()[0])
@@ -118,18 +123,42 @@ for line in sys.stdin:
   if match:
     #print("electron")
     #print(match.groups())
-    # convert from cm to m
-    data["e_start_x"][0] = 1e-2*float(match.groups()[0])
-    data["e_start_y"][0] = 1e-2*float(match.groups()[1])
-    data["e_start_z"][0] = 1e-2*float(match.groups()[2])
-    # convert form us to s
-    data["e_drift_t"][0] = 1e-6*float(match.groups()[3])
-    data["hit_wire"][0]  =   int(match.groups()[4])
+    ## convert from cm to m
+    #data["e_start_x"][0] = 1e-2*float(match.groups()[0])
+    #data["e_start_y"][0] = 1e-2*float(match.groups()[1])
+    #data["e_start_z"][0] = 1e-2*float(match.groups()[2])
+    ## convert form us to s
+    #data["e_drift_t"][0] = 1e-6*float(match.groups()[3])
+    #data["hit_wire"][0]  =   int(match.groups()[4])
+    
+    # don't add directly, store them in an intermediate list
+    e_list += [{
+      "e_start_x" : 1e-2*float(match.groups()[0]),
+      "e_start_y" : 1e-2*float(match.groups()[1]),
+      "e_start_z" : 1e-2*float(match.groups()[2]),
+      "e_drift_t" : 1e-6*float(match.groups()[3]),
+      "hit_wire"  : int(match.groups()[4])
+    }]
     #print("hit wire: {:d}".format(data["hit_wire"][0]))
     electrons += 1
-    print("got {:d} electrons".format(electrons)+" "*20+"\r", end=" ")
-    
-    data_tree.Fill()
+
+  ### the end of an event, the next line will contain "INPGET"
+  ### time to fill the tree with electrons in the order of their arrival
+  if "INPGET" in line and electrons > 0:
+    e_list = sorted(e_list,key=itemgetter("e_drift_t"))
+    e_number = 0 
+    print("got {:d} electrons".format(electrons))
+    electrons = 0
+    for entry in e_list:
+      data["e_start_x"][0] = entry["e_start_x"]
+      data["e_start_y"][0] = entry["e_start_y"]
+      data["e_start_z"][0] = entry["e_start_z"]
+      data["e_drift_t"][0] = entry["e_drift_t"]
+      data["hit_wire"][0]  = entry["hit_wire"]
+      data["e_number"][0] = e_number
+      
+      data_tree.Fill()
+      e_number += 1
 
 data_tree.Write()    
 
