@@ -1,8 +1,7 @@
 {
-  "drift_options": [
-    "cosy_1e5_tracks_fish.sh"
-  ],
+  "drift_options": [],
   "field_options": [
+    "plot_surf_E_cross_section.txt",
     "view_inner_cube_3d.txt"
   ],
   "gas_options": "ar70_co230.txt",
