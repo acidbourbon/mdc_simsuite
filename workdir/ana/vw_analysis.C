@@ -290,14 +290,14 @@ TObjArray* my_fit_slices_y(TH2F* hist, Float_t t1_noise){
 
 
 
-//                   _          __                  _   _             
-//                  (_)        / _|                | | (_)            
-//   _ __ ___   __ _ _ _ __   | |_ _   _ _ __   ___| |_ _  ___  _ __  
-//  | '_ ` _ \ / _` | | '_ \  |  _| | | | '_ \ / __| __| |/ _ \| '_ \ 
-//  | | | | | | (_| | | | | | | | | |_| | | | | (__| |_| | (_) | | | |
-//  |_| |_| |_|\__,_|_|_| |_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|
-//                                                                    
-//                                                                    
+//                   _          __                  _   _               #
+//                  (_)        / _|                | | (_)              #
+//   _ __ ___   __ _ _ _ __   | |_ _   _ _ __   ___| |_ _  ___  _ __    #
+//  | '_ ` _ \ / _` | | '_ \  |  _| | | | '_ \ / __| __| |/ _ \| '_ \   #
+//  | | | | | | (_| | | | | | | | | |_| | | | | (__| |_| | (_) | | | |  #
+//  |_| |_| |_|\__,_|_|_| |_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|  #
+//                                                                      #
+//                                                                      # 
 
 
 
@@ -307,20 +307,6 @@ TObjArray* my_fit_slices_y(TH2F* hist, Float_t t1_noise){
 void vw_analysis(TString infile) {
   
   
-//   // this is the fit function also used in the beamtime analysis
-//     
-//     Float_t backgnd_scale_0     = 1.509e-01;
-//     Float_t backgnd_shift_1 = 1.0354;
-//     Float_t backgnd_scale_2 = 3.124;
-//     Float_t x_shift         = 5;
-//   
-//   
-//   if (1) { // is PASTTREC data
-//     backgnd_scale_0 = 0.2;
-//     backgnd_shift_1 = 1.05;
-//     backgnd_scale_2 = 2.6;
-//     x_shift         = 0;
-//   }    
   
   Float_t sample_width = 1.6e-6/10;
   Int_t samples = 3200/10/2;
@@ -339,6 +325,8 @@ void vw_analysis(TString infile) {
   
   Float_t t1_noise=from_env_float("t1_noise","0");
   
+  Float_t fish_z_max=from_env_float("fish_z_max","0");
+  
   TString t1_noise_method=from_env("t1_noise_method","random");
   Bool_t add_noise = false;
   if (t1_noise_method == "random")
@@ -346,11 +334,9 @@ void vw_analysis(TString infile) {
   if (t1_noise  == 0)
     add_noise = false;
   
-//   Float_t t1_scaler=from_env_float("t1_scaler","1");
   Int_t  primaries=from_env_int("primaries","0");
   
   
-//   Float_t t1_noise=from_env_float("t1_noise_method","random");
   
   Float_t bootstrap_factor=from_env_float("bootstrap_factor","1");
   
@@ -376,12 +362,12 @@ void vw_analysis(TString infile) {
   TH1*  th_esig_cum = 0;
   
   Float_t t1_offset = 20;
-  TH2F* th2_first_e = new TH2F("th2_first_e","th2_first_e;y pos (mm);tdrift first electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
+  TH2F* th2_first_e  = new TH2F("th2_first_e","th2_first_e;y pos (mm);tdrift first electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
   TH2F* th2_second_e = new TH2F("th2_second_e","th2_second_e;y pos (mm);tdrift second electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
-  TH2F* th2_third_e = new TH2F("th2_third_e","th2_third_e;y pos (mm);tdrift third electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
+  TH2F* th2_third_e  = new TH2F("th2_third_e","th2_third_e;y pos (mm);tdrift third electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
   TH2F* th2_fourth_e = new TH2F("th2_fourth_e","th2_fourth_e;y pos (mm);tdrift fourth electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
-  TH2F* th2_fifth_e = new TH2F("th2_fifth_e","th2_fifth_e;y pos (mm);tdrift fifth electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
-  TH2F* th2_sixth_e = new TH2F("th2_sixth_e","th2_sixth_e;y pos (mm);tdrift sixth electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
+  TH2F* th2_fifth_e  = new TH2F("th2_fifth_e","th2_fifth_e;y pos (mm);tdrift fifth electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
+  TH2F* th2_sixth_e  = new TH2F("th2_sixth_e","th2_sixth_e;y pos (mm);tdrift sixth electron (ns)",y_pos_bins,-3,3,samples,0-t1_offset,sample_width*1e9-t1_offset);
  
   
   
@@ -390,10 +376,6 @@ void vw_analysis(TString infile) {
 for(Int_t bs = 0; bs < bootstrap_factor; ++bs){
   
   Float_t e_drift_t;
-  Float_t e_drift_t_first;
-  Float_t e_drift_t_second;
-  Float_t e_drift_t_third;
-  Float_t e_drift_t_fourth;
   Float_t x,y,last_y;
   Int_t n,hit_wire;
   Float_t last_n = 1;
@@ -403,8 +385,6 @@ for(Int_t bs = 0; bs < bootstrap_factor; ++bs){
   garfield_tree->SetBranchAddress("track_start_y",&y);
   garfield_tree->SetBranchAddress("hit_wire",&hit_wire);
  
-//   new TCanvas();
-//   th_kern->Draw();
   
   
   Float_t e_drift_t_a = 1000;
@@ -430,17 +410,7 @@ for(Int_t bs = 0; bs < bootstrap_factor; ++bs){
       n++; // to trigger last processing
     }
     
-//     cout << "n: " << n << endl;
     if (n > last_n){
-//       cout << "new N! " << endl;
-//       new TCanvas();
-/*      
-      delete th_conv;
-      th_conv = fftconvolve(th_kern,th_esig);
-      
-      th_conv->GetXaxis()->SetRangeUser(-0.1e-6,0.5e-6);
-      th_conv->GetYaxis()->SetRangeUser(-2e-3,0.5e-3); */
-//       th_esig->DrawClone();
 
       e_drift_t_a = 1000;
       e_drift_t_b = 1000;
@@ -486,19 +456,9 @@ for(Int_t bs = 0; bs < bootstrap_factor; ++bs){
       
       if(draw_pulses && n < 100){
         if(last_n == 1){
-//           th_conv->DrawClone();
           th_esig->DrawClone();
-        } else {
-//           th_conv->DrawClone("same");
-//           th_esig->DrawClone("same");
         }
       }
-//       gROOT->cd();
-//       th_esig_cum = th_esig->GetCumulative();
-//       th_conv->SetName(Form("%d pulse",i));
-// //       th_conv->Write();
-//       hist_to_tarrayf(th_conv,signal_xarr,signal_yarr);
-//       pulse_mem->Fill();
       th_esig->Reset();
       
     }
@@ -513,17 +473,12 @@ for(Int_t bs = 0; bs < bootstrap_factor; ++bs){
     }
     
     th_esig->Fill(e_drift_t);
-//     th_esig->Fill(0.01*1e-6,weight);
     
     last_n = n;
     last_y = y;
   }
   
 }
-//   pulse_mem->Write();
-
-// new TCanvas();
-// th2_first_e->Draw("colz");
 
 f_out->cd();
 
@@ -629,40 +584,22 @@ sliced_sigmas_fifth_e->SetLineWidth(2);
 sliced_means_sixth_e->SetLineWidth(2);
 sliced_sigmas_sixth_e->SetLineWidth(2);
 
-sliced_means_first_e->SetTitle("first electron");
-sliced_sigmas_first_e->SetTitle("first electron");
-sliced_means_second_e->SetTitle("second electron");
-sliced_sigmas_second_e->SetTitle("second electron");
-sliced_means_third_e->SetTitle("third electron");
-sliced_sigmas_third_e->SetTitle("third electron");
-sliced_means_fourth_e->SetTitle("fourth electron");
-sliced_sigmas_fourth_e->SetTitle("fourth electron");
-sliced_means_fifth_e->SetTitle("fifth electron");
-sliced_sigmas_fifth_e->SetTitle("fifth electron");
-sliced_means_sixth_e->SetTitle("sixth electron");
-sliced_sigmas_sixth_e->SetTitle("sixth electron");
+sliced_means_first_e->SetTitle(  "drift time mean first electron");
+sliced_means_second_e->SetTitle( "drift time mean second electron");
+sliced_means_third_e->SetTitle(  "drift time mean third electron");
+sliced_means_fourth_e->SetTitle( "drift time mean fourth electron");
+sliced_means_fifth_e->SetTitle(  "drift time mean fifth electron");
+sliced_means_sixth_e->SetTitle(  "drift time mean sixth electron");
+sliced_sigmas_first_e->SetTitle( "drift time stdev first electron");
+sliced_sigmas_second_e->SetTitle("drift time stdev second electron");
+sliced_sigmas_third_e->SetTitle( "drift time stdev third electron");
+sliced_sigmas_fourth_e->SetTitle("drift time stdev fourth electron");
+sliced_sigmas_fifth_e->SetTitle( "drift time stdev fifth electron");
+sliced_sigmas_sixth_e->SetTitle( "drift time stdev sixth electron");
 
 
 
-
-// sliced_means_first_e->SetLineColor(1);
-// sliced_sigmas_first_e->SetLineColor(1);
-// sliced_means_second_e->SetLineColor(2);
-// sliced_sigmas_second_e->SetLineColor(2);
-// sliced_means_third_e->SetLineColor(3);
-// sliced_sigmas_third_e->SetLineColor(3);
-// sliced_means_fourth_e->SetLineColor(4);
-// sliced_sigmas_fourth_e->SetLineColor(4);
-
-// TFile* tf_t1_comp = new TFile("Link_to_Drift_Time.root");
-// TMultiGraph* mg_t1_comp = (TMultiGraph*) tf_t1_comp->Get("multigraph");
-// // new TCanvas();
-// // mg_t1_comp->DrawClone("APL");
-// f_out->cd();
-// 
-
-
-TCanvas* c_means_first_to_fourth = new TCanvas();
+TCanvas* c_means_first_to_sixth = new TCanvas();
 // mg_t1_comp->DrawClone("AP");
 sliced_means_first_e->DrawClone("L");
 sliced_means_second_e->DrawClone("same L");
@@ -671,20 +608,10 @@ sliced_means_fourth_e->DrawClone("same L");
 sliced_means_fifth_e->DrawClone("same L");
 sliced_means_sixth_e->DrawClone("same L");
 
-c_means_first_to_fourth->BuildLegend();
+c_means_first_to_sixth->BuildLegend();
 
-// TFile* tf_sigma_comp = new TFile("Link_to_drift_time_uncertainty.root");
-// TMultiGraph* mg_sigma_comp = (TMultiGraph*) tf_sigma_comp->Get("multigraph");
-// // new TCanvas();
-// // mg_sigma_comp->DrawClone("APL");
-// f_out->cd();
 
-TCanvas* c_sigmas_first_to_fourth = new TCanvas();
-// TH1F* dummy_sigmas = new TH1F("dummy_sigmas","dummy_sigmas",100,-3,3);
-// dummy_sigmas->SetMaximum(10);
-// dummy_sigmas->SetMinimum(0);
-// dummy_sigmas->Draw();
-// mg_sigma_comp->DrawClone("AP");
+TCanvas* c_sigmas_first_to_sixth = new TCanvas();
 sliced_sigmas_first_e->DrawClone("L");
 sliced_sigmas_second_e->DrawClone("same L");
 sliced_sigmas_third_e->DrawClone("same L");
@@ -692,23 +619,23 @@ sliced_sigmas_fourth_e->DrawClone("same L");
 sliced_sigmas_fifth_e->DrawClone("same L");
 sliced_sigmas_sixth_e->DrawClone("same L");
 
-c_sigmas_first_to_fourth->BuildLegend();
+c_sigmas_first_to_sixth->BuildLegend();
 
 
 
-TCanvas* c_first_to_fourth = new TCanvas();
-c_first_to_fourth->Divide(3,2);
-c_first_to_fourth->cd(1);
+TCanvas* c_first_to_sixth = new TCanvas();
+c_first_to_sixth->Divide(3,2);
+c_first_to_sixth->cd(1);
 th2_first_e->Draw("colz");
-c_first_to_fourth->cd(2);
+c_first_to_sixth->cd(2);
 th2_second_e->Draw("colz");
-c_first_to_fourth->cd(3);
+c_first_to_sixth->cd(3);
 th2_third_e->Draw("colz");
-c_first_to_fourth->cd(4);
+c_first_to_sixth->cd(4);
 th2_fourth_e->Draw("colz");
-c_first_to_fourth->cd(5);
+c_first_to_sixth->cd(5);
 th2_fifth_e->Draw("colz");
-c_first_to_fourth->cd(6);
+c_first_to_sixth->cd(6);
 th2_sixth_e->Draw("colz");
 
 TCanvas* fish_canvas = new TCanvas();
@@ -720,7 +647,8 @@ for (Int_t i = 0; i < 6; ++i){
                   Form("e_drift_t_b <1000 && e_number == %d",i),"colz");
   TH2F* this_fish = (TH2F*) f_out->Get(Form("fish%d",i));
   this_fish->SetMinimum(0);
-  this_fish->SetMaximum(30);
+  if(fish_z_max)
+    this_fish->SetMaximum(fish_z_max);
   this_fish->GetXaxis()->SetRangeUser(-50,200);
   
 }
@@ -743,34 +671,34 @@ for (Int_t i = 0; i < 6; ++i){
 
 
 
-TCanvas* vw_canv = new TCanvas("vw_canv","vw_canv",1600,700); 
-vw_canv->Divide(2,1);
-vw_canv->cd(1);
-
-// mg_t1_comp->GetXaxis()->SetLimits(-2.6,2.6);
-// mg_t1_comp->DrawClone("AP");
-sliced_means_first_e->DrawClone("same L");
-sliced_means_second_e->DrawClone("same L");
-sliced_means_third_e->DrawClone("same L");
-sliced_means_fourth_e->DrawClone("same L");
-sliced_means_fifth_e->DrawClone("same L");
-// TH1F* fourth_scaled = (TH1F*) sliced_means_fourth_e->Clone();
-// fourth_scaled->Scale(0.9);
-// for (Int_t i = 1; i < fourth_scaled->GetNbinsX(); ++i){
-//   fourth_scaled->SetBinError(i,0);
-// }
-// fourth_scaled->Draw("same");
-vw_canv->cd(1)->BuildLegend();
-
-vw_canv->cd(2);
-// mg_sigma_comp->GetXaxis()->SetLimits(-2.6,2.6);
-// mg_sigma_comp->DrawClone("AP");
-sliced_sigmas_first_e->DrawClone("same L");
-sliced_sigmas_second_e->DrawClone("same L");
-sliced_sigmas_third_e->DrawClone("same L");
-sliced_sigmas_fourth_e->DrawClone("same L");
-sliced_sigmas_fifth_e->DrawClone("same L");
-vw_canv->cd(2)->BuildLegend();
+// TCanvas* vw_canv = new TCanvas("vw_canv","vw_canv",1600,700); 
+// vw_canv->Divide(2,1);
+// vw_canv->cd(1);
+// 
+// // mg_t1_comp->GetXaxis()->SetLimits(-2.6,2.6);
+// // mg_t1_comp->DrawClone("AP");
+// sliced_means_first_e->DrawClone("same L");
+// sliced_means_second_e->DrawClone("same L");
+// sliced_means_third_e->DrawClone("same L");
+// sliced_means_fourth_e->DrawClone("same L");
+// sliced_means_fifth_e->DrawClone("same L");
+// // TH1F* fourth_scaled = (TH1F*) sliced_means_fourth_e->Clone();
+// // fourth_scaled->Scale(0.9);
+// // for (Int_t i = 1; i < fourth_scaled->GetNbinsX(); ++i){
+// //   fourth_scaled->SetBinError(i,0);
+// // }
+// // fourth_scaled->Draw("same");
+// vw_canv->cd(1)->BuildLegend();
+// 
+// vw_canv->cd(2);
+// // mg_sigma_comp->GetXaxis()->SetLimits(-2.6,2.6);
+// // mg_sigma_comp->DrawClone("AP");
+// sliced_sigmas_first_e->DrawClone("same L");
+// sliced_sigmas_second_e->DrawClone("same L");
+// sliced_sigmas_third_e->DrawClone("same L");
+// sliced_sigmas_fourth_e->DrawClone("same L");
+// sliced_sigmas_fifth_e->DrawClone("same L");
+// vw_canv->cd(2)->BuildLegend();
 
 // th2_first_e_0->Draw(); // draw the first fit parameter (constant, in this case)
 // new TCanvas();
