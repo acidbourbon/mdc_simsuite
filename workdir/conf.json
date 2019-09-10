@@ -1,4 +1,5 @@
 {
+  "cell_spice_conf": "MDC1_63cm_1600V_270R_ser_50R_par.json",
   "drift_options": [
     "cosy_100_tracks_fish.sh"
   ],

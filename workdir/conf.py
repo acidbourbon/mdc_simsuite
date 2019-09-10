@@ -16,7 +16,8 @@ def create_empty_conf():
     "field_options" : [],
     "magnetic_options" : [],
     "drift_options" : [],
-    "gas_options" : []
+    "gas_options" : [],
+    "cell_spice_conf" : None
     #"cells" : [{"name":"dummy","conf":{}}]
     })
 
@@ -31,6 +32,18 @@ def get_selected_cell():
 def set_selected_cell(name):
   conf = get_conf_json()
   conf["selected_cell"] = name
+  write_conf_json(conf)
+  
+def get_cell_spice_conf():
+  conf = get_conf_json()
+  if conf["cell_spice_conf"] is None:
+    return "none"
+  else:
+    return conf["cell_spice_conf"]
+  
+def set_cell_spice_conf(name):
+  conf = get_conf_json()
+  conf["cell_spice_conf"] = name
   write_conf_json(conf)
   
 

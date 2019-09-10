@@ -44,6 +44,13 @@ while True:
                  ("",""),
                  ("","---   analysis   ---"),
                  ("09","run macro on data"),
+                 ("",""),
+                 ("","---   SPICE   ---"),
+                 ("11","select cell spice conf"),
+                 ("10","edit circuit model in LTSpice"),
+                 ("12","calc ana. signals from GARFIELD data"),
+                 ("",""),
+                 ("",""),
                  ("z","exit")] )
     #if code == d.OK:
       #mm_tag = tag
@@ -99,6 +106,22 @@ while True:
           os.system("./ana/{:s}".format(tag))
         else:
           break
+        
+    if tag == "10":
+      while True:
+        code, tag = dialog_asc_menu()
+        if code == d.OK:
+          os.system("wine /LTspiceXVII/XVIIx64.exe cell_spice/{:s}".format(tag))
+        else:
+          break
+      
+    if tag == "11":
+      dialog_spice_conf()
+      
+    if tag == "12":
+      os.system("cd cell_spice;  ./calc_sig.py cell_spice_conf={:s}".format(conf.get_cell_spice_conf()))
+      # break until any key press
+      dummy=sys.stdin.readline()
       
     if tag == "z":
       exit()
