@@ -119,9 +119,9 @@ while True:
       dialog_spice_conf()
       
     if tag == "12":
-      os.system("cd cell_spice;  ./calc_sig.py cell_spice_conf={:s}".format(conf.get_cell_spice_conf()))
+      os.system("cd cell_spice;  ./calc_sig.py cell_spice_conf={:s} plot_n_tracks=10 plot_alpha=0.6".format(conf.get_cell_spice_conf()))
       # break until any key press
-      dummy=sys.stdin.readline()
+      #dummy=sys.stdin.readline()
       
     if tag == "z":
       exit()

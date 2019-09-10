@@ -9,7 +9,9 @@ from apply_network import apply_network
 import sys
 import json
 import os
-
+from ROOT import TFile, TBrowser
+  
+import matplotlib.pyplot as plt
 
 def get_file_json(name):
   if os.path.isfile(name) :
@@ -61,10 +63,17 @@ def calc_sig(**kwargs):
 
   cell_spice_conf = kwargs.get("cell_spice_conf","none")
   
+  plot_n_tracks = int(kwargs.get("plot_n_tracks",10))
+  plot_alpha_factor = float(kwargs.get("plot_alpha_factor",2))
+  plot_alpha = float(kwargs.get("plot_alpha",plot_alpha_factor*1/plot_n_tracks))
+  plot_opt = kwargs.get("plot_opt",'b-')
+  
   cell_spice_conf_json = get_file_json(cell_spice_conf)
   
   configuration = cell_spice_conf_json["configuration"]
   model         = cell_spice_conf_json["model"]
+  
+  
   
   ## approximate delta pulse with narrow gaussian at t=10ns
   #delta_pulse = gauss(time,mu=10e-9,sigma=2*delta_t)
@@ -98,6 +107,72 @@ def calc_sig(**kwargs):
   i_avalanche = avalanche_current(time, **configuration) # pass dict configuration as kwargs
   
   
+  ##################################################
+  ##        convolve avalanche and cell IR        ##
+  ##################################################
+ 
+  ava_c_cell_fft = fft_convolve(time,[i_avalanche,v_cell_ir])
+  dummy, ava_c_cell_fft = shift_time(time, ava_c_cell_fft, -20e-9) ## shift back in time to compensate for the 10 ns offsets in both IRs
+  
+  
+    
+  time_ns = time /1e-9
+    
+    #plt.plot(time_ns,v_meas, label="v(meas08)")
+    #plt.plot(time_ns,218.5*ava_c_cell_fft, label="v(218.5*avalanche conv cell)")
+  
+  ##################################################
+  ##           open garfield root file            ##
+  ##################################################
+  
+  f = TFile(garfield_root_file)
+  tree = f.Get("data_tree")
+  tree.Draw("e_drift_t")
+  
+  #a=TBrowser()
+  
+  ## variables that will be filled from root tree:
+  last_evt = 0
+  
+  garfield_signal = np.zeros(len(time))
+  
+  entries = tree.GetEntries()
+  print("tree has {:d} entries".format(entries))
+  
+  processed_tracks = 0
+  
+  for i in range(0,entries+1):
+    
+    if i == entries:
+      evt += 1 ## to trigger the last round of processing, when all entries from tree have been processed
+    else:
+      tree.GetEntry(i)
+      evt = tree.evt
+    
+    
+    if evt > last_evt: 
+      ava_c_cell_c_garfield_fft = fft_convolve(time,[ava_c_cell_fft,garfield_signal])
+      garfield_signal = np.zeros(len(time)) # clear accumulator
+      processed_tracks += 1
+      print("new track at index {:d}".format(i))
+      print("processed tracks: {:d}".format(processed_tracks))
+      if plot_n_tracks:
+        plt.plot(time_ns,ava_c_cell_c_garfield_fft*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
+      if( processed_tracks >= plot_n_tracks):
+        break
+      
+      
+    if(tree.hit_wire == hit_wire): # we hit the selected sense wire (default = 1)
+      index = int(tree.e_drift_t/delta_t)
+      garfield_signal[index] += 1/delta_t # fill one unit of particle into sample time slice
+    
+    
+    
+    last_evt = tree.evt
+    
+    
+    
+  
   
   
   #### load garfield signal ###
@@ -110,25 +185,17 @@ def calc_sig(**kwargs):
   ### load a measurement ###
   dummy, v_meas = load_and_resample("meas08_resampled.txt", time, x_offset=-299e-9+40e-9)
 
-  ava_c_cell_fft = fft_convolve(time,[i_avalanche,v_cell_ir])
-  dummy, ava_c_cell_fft = shift_time(time, ava_c_cell_fft, 25e-9)
 
   #ava_c_cell_c_gar_fft = fft_convolve(time,[i_avalanche,i_cell,garfield_y])
   #dummy, ava_c_cell_c_gar_fft = shift_time(time, ava_c_cell_c_gar_fft, -32.5e-9+40e-9)
 
 
-  if True:
-    import matplotlib.pyplot as plt
-    
-    time_ns = time /1e-9
-    
-    plt.plot(time_ns,v_meas, label="v(meas08)")
-    plt.plot(time_ns,218.5*ava_c_cell_fft, label="v(218.5*avalanche conv cell)")
+  if plot_n_tracks:
     
     plt.xlabel("time (ns)")
-    plt.ylabel("voltage (V)")
+    plt.ylabel("voltage (mV)")
     
-    plt.legend() # order a legend.
+    #plt.legend() # order a legend.
     plt.show()
     
     
