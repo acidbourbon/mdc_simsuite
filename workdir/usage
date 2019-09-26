@@ -1,0 +1,4 @@
+
+./gen_MDC_cell.py; ./view.sh
+
+./gen_MDC_cell.py v_field=-500 layer_pitch=1.5e-3; ./view.sh

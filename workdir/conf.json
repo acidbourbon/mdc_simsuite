@@ -1,8 +1,9 @@
 {
-  "cell_spice_conf": "MDC1_63cm_1600V_270R_ser_50R_par.json",
+  "cell_spice_conf": "MDC1_63cm_1600V_270R_ser_50R_par.cell.json",
   "drift_options": [
-    "cosy_100_tracks_fish.sh"
+    "MIP_track.sh"
   ],
+  "fee_spice_conf": "pasttrec_pkt15ns.fee.json",
   "field_options": [
     "plot_surf_E_cross_section.txt",
     "view_inner_cube_3d.txt"

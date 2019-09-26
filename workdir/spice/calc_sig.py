@@ -9,7 +9,7 @@ from apply_network import apply_network
 import sys
 import json
 import os
-from ROOT import TFile, TBrowser
+from ROOT import TFile, TBrowser, TH1F
   
 import matplotlib.pyplot as plt
 
@@ -120,6 +120,14 @@ def calc_sig(**kwargs):
     
     #plt.plot(time_ns,v_meas, label="v(meas08)")
     #plt.plot(time_ns,218.5*ava_c_cell_fft, label="v(218.5*avalanche conv cell)")
+    
+    
+  ##################################################
+  ##        create signal output rootfile         ##
+  ##################################################
+    
+  root_out = TFile("../ana_signals.root","RECREATE")
+  root_out.cd()
   
   ##################################################
   ##           open garfield root file            ##
@@ -127,9 +135,9 @@ def calc_sig(**kwargs):
   
   f = TFile(garfield_root_file)
   tree = f.Get("data_tree")
-  tree.Draw("e_drift_t")
+  #tree.Draw("e_drift_t")
   
-  #a=TBrowser()
+  a=TBrowser()
   
   ## variables that will be filled from root tree:
   last_evt = 0
@@ -152,14 +160,26 @@ def calc_sig(**kwargs):
     
     if evt > last_evt: 
       ava_c_cell_c_garfield_fft = fft_convolve(time,[ava_c_cell_fft,garfield_signal])
-      garfield_signal = np.zeros(len(time)) # clear accumulator
       processed_tracks += 1
       print("new track at index {:d}".format(i))
       print("processed tracks: {:d}".format(processed_tracks))
-      if plot_n_tracks:
+      if plot_n_tracks and processed_tracks <= plot_n_tracks:
         plt.plot(time_ns,ava_c_cell_c_garfield_fft*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
-      if( processed_tracks >= plot_n_tracks):
-        break
+        
+      ## write to root file
+      root_out.cd()
+      t1_sig_hist = TH1F("t1_sig_{:08d}".format(processed_tracks),"t1_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
+      ana_sig_hist = TH1F("ana_sig_{:08d}".format(processed_tracks),"ana_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
+      for i in range(0,samples):
+        t1_sig_hist.SetBinContent(i+1,garfield_signal[i])
+        ana_sig_hist.SetBinContent(i+1,ava_c_cell_c_garfield_fft[i])
+        
+      t1_sig_hist.Write()
+      ana_sig_hist.Write()
+      
+      # clear the accumulator vector again
+      garfield_signal = np.zeros(len(time)) # clear accumulator
+      
       
       
     if(tree.hit_wire == hit_wire): # we hit the selected sense wire (default = 1)
@@ -186,9 +206,8 @@ def calc_sig(**kwargs):
   dummy, v_meas = load_and_resample("meas08_resampled.txt", time, x_offset=-299e-9+40e-9)
 
 
-  #ava_c_cell_c_gar_fft = fft_convolve(time,[i_avalanche,i_cell,garfield_y])
-  #dummy, ava_c_cell_c_gar_fft = shift_time(time, ava_c_cell_c_gar_fft, -32.5e-9+40e-9)
 
+  #root_out.Close()
 
   if plot_n_tracks:
     

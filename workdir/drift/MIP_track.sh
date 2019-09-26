@@ -3,7 +3,7 @@
 x=0.1
 y=0.1
 halflength=0.4
-n=2
+n=5
 
 for i in $(seq 1 $n); do
 cat <<EOF

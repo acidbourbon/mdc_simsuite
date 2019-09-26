@@ -1,0 +1,10 @@
+{
+  "model":"pasttrec_model.asc",
+  "configuration": {
+    "Z_in":50,
+    "TCR1":27e3,
+    "TCC1":10.5e-12,
+    "TCR2":20e3,
+    "TCC2":0.9e-12
+  }
+}

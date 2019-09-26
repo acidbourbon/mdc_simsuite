@@ -24,33 +24,33 @@ while True:
   menu_title_width = 20
 
   if mm_tag == "":
-    code, tag = d.menu("main menu", height="30", menu_height="28",
+    code, tag = d.menu("main menu", height="44", menu_height="40",
       choices = [
-                 ("","---   CELL       ---"),
+                 ("  ","---   CELL       ---"),
                  ("01","selected: {:s}".format(conf.get_selected_cell())),
-                 ("","---   FIELD      ---"),
+                 ("  ","---   FIELD      ---"),
                  ("02","set field options"),
-                 ("","---   MAGNETIC   ---"),
+                 ("  ","---   MAGNETIC   ---"),
                  ("06","set magnetic options"),
-                 ("","---   GAS        ---"),
+                 ("  ","---   GAS        ---"),
                  ("08","select gas"),
-                 ("","---   DRIFT      ---"),
+                 ("  ","---   DRIFT      ---"),
                  ("07","set drift options"),
-                 ("",""),
-                 ("","--- run GARFIELD ---"),
+                 ("  ",""),
+                 ("  ","--- run GARFIELD ---"),
                  ("03","run with graphics output"),
                  ("04","run w/o graphics"),
                  ("05","only create garfield_in.txt"),
-                 ("",""),
-                 ("","---   analysis   ---"),
+                 ("  ",""),
+                 ("  ","---   analysis   ---"),
                  ("09","run macro on data"),
-                 ("",""),
-                 ("","---   SPICE   ---"),
+                 ("  ",""),
+                 ("  ","---   SPICE   ---"),
                  ("11","select cell spice conf"),
+                 ("13","select FEE spice conf"),
                  ("10","edit circuit model in LTSpice"),
                  ("12","calc ana. signals from GARFIELD data"),
-                 ("",""),
-                 ("",""),
+                 ("  ",""),
                  ("z","exit")] )
     #if code == d.OK:
       #mm_tag = tag
@@ -111,17 +111,20 @@ while True:
       while True:
         code, tag = dialog_asc_menu()
         if code == d.OK:
-          os.system("wine /LTspiceXVII/XVIIx64.exe cell_spice/{:s}".format(tag))
+          os.system("wine /LTspiceXVII/XVIIx64.exe spice/{:s}".format(tag))
         else:
           break
       
     if tag == "11":
-      dialog_spice_conf()
+      dialog_cell_spice_conf()
+      
+    if tag == "13":
+      dialog_fee_spice_conf()
       
     if tag == "12":
-      os.system("cd cell_spice;  ./calc_sig.py cell_spice_conf={:s} plot_n_tracks=10 plot_alpha=0.6".format(conf.get_cell_spice_conf()))
+      os.system("cd spice;  ./calc_sig.py cell_spice_conf={:s} plot_n_tracks=10 plot_alpha=0.6".format(conf.get_cell_spice_conf()))
       # break until any key press
-      #dummy=sys.stdin.readline()
+      dummy=sys.stdin.readline()
       
     if tag == "z":
       exit()

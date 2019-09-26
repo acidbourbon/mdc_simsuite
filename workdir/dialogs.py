@@ -164,36 +164,53 @@ def dialog_asc_menu():
   
   choices = []
   
-  for entry in conf.list_dir("./cell_spice",ext=".asc"):
+  for entry in conf.list_dir("./spice",ext=".asc"):
     choices+= [(entry,"")]
     
   if len(choices):
     code, tag = d.menu("select SPICE circuit model to edit", choices=choices)
     return (code,tag)
   else:
-    d.infobox("no option files in ./cell_spice", width=0, height=0, title="done")
+    d.infobox("no option files in ./spice", width=0, height=0, title="done")
     time.sleep(2)
   
   
   #, width=width, height=height, list_height=list_height)
 
-def dialog_spice_conf():
+def dialog_cell_spice_conf():
   d = Dialog(dialog="dialog")
   d.set_background_title("Select spice model conf file")
-  
-  gas_options = conf.get_gas_options()
+ 
+  cell_spice_conf = conf.get_cell_spice_conf()
   
   choices = []
   
-  for entry in conf.list_dir("./cell_spice",ext=".json"):
-    choices+= [(entry,"",(entry == conf.get_cell_spice_conf() ))]
-  #for entry in conf.list_dir("./gas",ext=".sh"):
-    #choices+= [(entry,"",(entry in gas_options))]
+  for entry in conf.list_dir("./spice",ext=".cell.json"):
+    choices+= [(entry,"",(entry == cell_spice_conf ))]
     
   if len(choices):
     code, selection = d.radiolist("select cell spice configuration file", choices=choices)
     if code == d.OK:
       conf.set_cell_spice_conf(selection)
   else:
-    d.infobox("no option files in ./cell_spice", width=0, height=0, title="done")
+    d.infobox("no option files in ./spice", width=0, height=0, title="done")
+    time.sleep(2)
+    
+def dialog_fee_spice_conf():
+  d = Dialog(dialog="dialog")
+  d.set_background_title("Select spice model conf file")
+ 
+  fee_spice_conf = conf.get_fee_spice_conf()
+  
+  choices = []
+  
+  for entry in conf.list_dir("./spice",ext=".fee.json"):
+    choices+= [(entry,"",(entry == fee_spice_conf ))]
+    
+  if len(choices):
+    code, selection = d.radiolist("select cell spice configuration file", choices=choices)
+    if code == d.OK:
+      conf.set_fee_spice_conf(selection)
+  else:
+    d.infobox("no option files in ./spice", width=0, height=0, title="done")
     time.sleep(2)

@@ -17,7 +17,8 @@ def create_empty_conf():
     "magnetic_options" : [],
     "drift_options" : [],
     "gas_options" : [],
-    "cell_spice_conf" : None
+    "cell_spice_conf" : None,
+    "fee_spice_conf" : None
     #"cells" : [{"name":"dummy","conf":{}}]
     })
 
@@ -44,6 +45,18 @@ def get_cell_spice_conf():
 def set_cell_spice_conf(name):
   conf = get_conf_json()
   conf["cell_spice_conf"] = name
+  write_conf_json(conf)
+  
+def get_fee_spice_conf():
+  conf = get_conf_json()
+  if conf["fee_spice_conf"] is None:
+    return "none"
+  else:
+    return conf["fee_spice_conf"]
+  
+def set_fee_spice_conf(name):
+  conf = get_conf_json()
+  conf["fee_spice_conf"] = name
   write_conf_json(conf)
   
 
