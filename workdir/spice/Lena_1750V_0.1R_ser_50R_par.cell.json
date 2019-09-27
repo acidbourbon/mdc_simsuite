@@ -1,0 +1,15 @@
+{
+  "model":"tline_model.asc",
+  "configuration": {
+    "U":1750,
+    "length":0.5,
+    "src_pos":0.5,  
+    "r_term_ser":0.1,
+    "r_term_par":50,
+    "c_fpc":14e-12,
+    "ra":10e-6,
+    "rb":2.5e-3,
+    "gain":1.4e5
+
+  }
+}
