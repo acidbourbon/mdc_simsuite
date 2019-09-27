@@ -122,9 +122,16 @@ while True:
       dialog_fee_spice_conf()
       
     if tag == "12":
-      os.system("cd spice;  ./calc_sig.py cell_spice_conf={:s} plot_n_tracks=10 plot_alpha=0.6".format(conf.get_cell_spice_conf()))
-      # break until any key press
-      dummy=sys.stdin.readline()
+      code, num_str = d.inputbox("number of tracks to process (0=all)", height=None, width=None, init='0')
+      if code == d.OK:
+        os.system("cd spice;  ./calc_sig.py cell_spice_conf={:s} fee_spice_conf={:s} plot_n_tracks=10 plot_alpha=0.6 process_n_tracks={:s}".format(
+        conf.get_cell_spice_conf(),
+        conf.get_fee_spice_conf(),
+        num_str))
+
+        # break until any key press
+        print("execution finished, hit enter to return to main menu")
+        dummy=sys.stdin.readline()
       
     if tag == "z":
       exit()

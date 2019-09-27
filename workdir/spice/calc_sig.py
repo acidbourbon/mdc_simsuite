@@ -85,7 +85,7 @@ def calc_sig(**kwargs):
   
   
   ##################################################
-  ##           call SPICE, generate IR            ##
+  ##        call SPICE, calculate cell IR         ##
   ##################################################
   
   cell_spice_conf = kwargs.get("cell_spice_conf","none")
@@ -99,7 +99,14 @@ def calc_sig(**kwargs):
         params=cell_configuration
         )
   
-  dummy, v_cell_ir = resample(time,spice_time,v_cell_ir) ## resample from spice time (short sample) to global time (long sample)
+  ## resample from spice time (short sample) to global time (long sample)
+  dummy, v_cell_ir = resample(time,spice_time,v_cell_ir) 
+  
+  
+  ##################################################
+  ##         call SPICE, calculate FEE IR         ##
+  ##################################################
+
 
 
 
