@@ -9,9 +9,20 @@ from apply_network import apply_network
 import sys
 import json
 import os
-from ROOT import TFile, TBrowser, TH1F
+from ROOT import TFile, TBrowser, TH1F, TTree
+from array import array
   
 import matplotlib.pyplot as plt
+
+import time as time_module
+
+lab_setup = False
+
+
+if lab_setup:
+  import rigol
+  import lecroy
+  import pasttrec_ctrl as ptc
 
 def get_file_json(name):
   if os.path.isfile(name) :
@@ -49,10 +60,14 @@ def calc_sig(**kwargs):
   
   
   garfield_root_file = kwargs.get("garfield_root_file","../drift_data.root")
+  
+  
+  process_n_tracks = int(kwargs.get("process_n_tracks",0))
+  write_analog_waveforms = int(kwargs.get("write_analog_waveforms",0))
 
   ### define main working time base
 
-  sample_width = kwargs.get("sample_width",2e-6)
+  sample_width = float(kwargs.get("sample_width",2e-6))
   delta_t = kwargs.get("delta_t", 0.1e-9)
   
   samples = int(sample_width/delta_t)
@@ -64,7 +79,7 @@ def calc_sig(**kwargs):
   
   plot_n_tracks = int(kwargs.get("plot_n_tracks",10))
   plot_alpha_factor = float(kwargs.get("plot_alpha_factor",2))
-  plot_alpha = float(kwargs.get("plot_alpha",plot_alpha_factor*1/plot_n_tracks))
+  plot_alpha = float(kwargs.get("plot_alpha",0.5))
   plot_opt = kwargs.get("plot_opt",'b-')
   
   
@@ -139,6 +154,30 @@ def calc_sig(**kwargs):
   root_out = TFile("../ana_signals.root","RECREATE")
   root_out.cd()
   
+  # create output root data structure
+  
+  scope_data_tree = TTree("scope_data_tree","scope_data_tree") 
+  
+  scope_data = {
+    "track_start_x":'f',
+    "track_start_y":'f',
+    "track_start_z":'f',
+    "track_end_x":'f',
+    "track_end_y":'f',
+    "track_end_z":'f',
+    "evt":'i',
+    "t1_a":'f',
+    "tot_a":'f',
+    "t1_b":'f',
+    "tot_b":'f'
+    }
+
+
+  for key in scope_data:
+    val_type = scope_data[key]
+    scope_data[key] = array(val_type,[0]) # replace type definition with array placeholder
+    scope_data_tree.Branch(key,scope_data[key],"{:s}/{:s}".format(key,val_type.upper()))
+  
   ##################################################
   ##           open garfield root file            ##
   ##################################################
@@ -150,16 +189,45 @@ def calc_sig(**kwargs):
   a=TBrowser()
   
   ## variables that will be filled from root tree:
-  last_evt = 0
+  last_evt = {}
+  last_evt["evt"]           = 0
+  last_evt["track_start_x"] = -1000
+  last_evt["track_start_y"] = -1000
+  last_evt["track_start_z"] = -1000
+  last_evt["track_end_x"]   = -1000
+  last_evt["track_end_y"]   = -1000
+  last_evt["track_end_z"]   = -1000
   
-  garfield_signal = np.zeros(len(time))
+  garfield_signal = []
+  
+  for i in range(0,2):
+    garfield_signal += [np.zeros(len(time))]
   
   entries = tree.GetEntries()
   print("tree has {:d} entries".format(entries))
   
+  
+  ##################################################
+  ##                init pasttrec                 ##
+  ##################################################
+  
+  if lab_setup:
+    ptc.init_board("0001",1,15,4,10) # no baseline correction, threshold 10
+  
+  # if you use baseline correction set it to baseline dac setting + 10!
+  
+  
+  ##################################################
+  ##             go process signals!              ##
+  ##################################################
+
+  
   processed_tracks = 0
+  evt = -1
   
   for i in range(0,entries+1):
+    
+    
     
     if i == entries:
       evt += 1 ## to trigger the last round of processing, when all entries from tree have been processed
@@ -167,41 +235,106 @@ def calc_sig(**kwargs):
       tree.GetEntry(i)
       evt = tree.evt
     
-    
-    if evt > last_evt: 
-      ava_c_cell_c_garfield_fft = fft_convolve(time,[ava_c_cell_fft,garfield_signal])
+    # trigger processing if we moved to the next event
+    if evt > last_evt["evt"]: 
+      
+      t1_a = -1000
+      t1_b = -1000
+      tot_a = -1000
+      tot_b = -1000
+      
       processed_tracks += 1
       print("new track at index {:d}".format(i))
       print("processed tracks: {:d}".format(processed_tracks))
-      if plot_n_tracks and processed_tracks <= plot_n_tracks:
-        plt.plot(time_ns,ava_c_cell_c_garfield_fft*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
+      
+      for w in range(0,2):
+        if np.sum(garfield_signal[w]) > 0:
+          ava_c_cell_c_garfield_fft = fft_convolve(time,[ava_c_cell_fft,garfield_signal[w]])
+          if plot_n_tracks and (processed_tracks <= plot_n_tracks):
+            plt.plot(time_ns,ava_c_cell_c_garfield_fft*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
+            
+          ## write to root file
+          root_out.cd()
+          if (w == 0) and write_analog_waveforms: 
+            # only write out waveform for wire 1 (0th array index), the fish partner wire is less important
+            t1_sig_hist = TH1F("t1_sig_{:08d}".format(processed_tracks),"t1_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
+            ana_sig_hist = TH1F("ana_sig_{:08d}".format(processed_tracks),"ana_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
+            for i in range(0,samples):
+              t1_sig_hist.SetBinContent(i+1,garfield_signal[w][i])
+              ana_sig_hist.SetBinContent(i+1,ava_c_cell_c_garfield_fft[i])
+              
+            t1_sig_hist.Write()
+            ana_sig_hist.Write()
         
-      ## write to root file
-      root_out.cd()
-      t1_sig_hist = TH1F("t1_sig_{:08d}".format(processed_tracks),"t1_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
-      ana_sig_hist = TH1F("ana_sig_{:08d}".format(processed_tracks),"ana_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
-      for i in range(0,samples):
-        t1_sig_hist.SetBinContent(i+1,garfield_signal[i])
-        ana_sig_hist.SetBinContent(i+1,ava_c_cell_c_garfield_fft[i])
+          # clear the accumulator vector again
+          garfield_signal[w] = np.zeros(len(time)) # clear accumulator
         
-      t1_sig_hist.Write()
-      ana_sig_hist.Write()
+          
+          if lab_setup:
+            ##################################################
+            ##              send signal to AWG              ##
+            ##################################################
+            # ava_c_cell_c_garfield_fft is voltage at parallel resistance
+            r_term_par = configuration["r_term_par"]
+            i_in = ava_c_cell_c_garfield_fft/float(r_term_par)
+            # use 50k to convert between AWG voltage to FEE input current
+            r_cur_src = 32.8e3
+            awg_volt = r_cur_src * i_in
+            rigol.set_waveform(1,time,awg_volt,v_range=3)
+            time_module.sleep(0.05)
+            
+            measure_statistics = lecroy.measure_statistics(["P3","P4"],3)
+            
+            measure_statistics["P3"].sort() ## median filter against noisy outlies
+            measure_statistics["P4"].sort() ## 
+            
+            if w == 0:
+              t1_a  = measure_statistics["P3"][1] ## middle element of sorted list
+              tot_a = measure_statistics["P4"][1]
+            else:
+              t1_b  = measure_statistics["P3"][1] ## middle element of sorted list
+              tot_b = measure_statistics["P4"][1]
       
-      # clear the accumulator vector again
-      garfield_signal = np.zeros(len(time)) # clear accumulator
+      scope_data["t1_a"][0]  = t1_a
+      scope_data["tot_a"][0]  = tot_a
+      scope_data["t1_b"][0]  = t1_b
+      scope_data["tot_b"][0]  = tot_b
+      scope_data["evt"][0] = last_evt["evt"]
+      
+      scope_data["track_start_x"][0] = last_evt["track_start_x"]
+      scope_data["track_start_y"][0] = last_evt["track_start_y"]
+      scope_data["track_start_z"][0] = last_evt["track_start_z"]
+      scope_data["track_end_x"][0]   = last_evt["track_end_x"]
+      scope_data["track_end_y"][0]   = last_evt["track_end_y"]
+      scope_data["track_end_z"][0]   = last_evt["track_end_z"]
+      
+      scope_data_tree.Fill()
+      if last_evt["evt"] % 1000 == 0:
+        scope_data_tree.Write()
+    
+      ##################################################
       
       
       
-    if(tree.hit_wire == hit_wire): # we hit the selected sense wire (default = 1)
+    if(tree.hit_wire > 0 and tree.hit_wire <= 2 ): # we hit the selected sense wire (default = 1)
       index = int(tree.e_drift_t/delta_t)
-      garfield_signal[index] += 1/delta_t # fill one unit of particle into sample time slice
+      garfield_signal[tree.hit_wire-1][index] += 1/delta_t # fill one unit of particle into sample time slice
     
     
     
-    last_evt = tree.evt
+    last_evt["evt"] = tree.evt
+    last_evt["track_start_x"] = tree.track_start_x
+    last_evt["track_start_y"] = tree.track_start_y
+    last_evt["track_start_z"] = tree.track_start_z
+    last_evt["track_end_x"]   = tree.track_end_x
+    last_evt["track_end_y"]   = tree.track_end_y
+    last_evt["track_end_z"]   = tree.track_end_z
     
     
+    if (process_n_tracks > 0) and processed_tracks >= process_n_tracks:
+      break
     
+  
   
   
   #### load garfield signal ###
@@ -227,6 +360,8 @@ def calc_sig(**kwargs):
     plt.show()
     
     
+  scope_data_tree.Write()
+  root_out.Close()
   
   
 
