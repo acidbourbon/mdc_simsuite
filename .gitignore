@@ -1,6 +1,6 @@
 *__pycache__
-spice/*.csv
-spice/*.txt
+workdir/spice/*.csv
+workdir/spice/*.txt
 *.log
 *.raw
 *.net
@@ -15,3 +15,4 @@ FIELD.txt
 GAS.txt
 MAGNETIC.txt
 *.root
+workdir/unneccessary_stuff/

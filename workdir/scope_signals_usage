@@ -1,0 +1,7 @@
+scope_data_tree->Draw("tot_a*1e9:t1_a*1e9>>potato(250,0,250,1000,0,1000)","","colz")
+
+scope_data_tree->Draw("(t1_b-t1_a)*1e9:(t1_a+t1_b)*1e9>>fish(250,0,250,200,-100,100)","","colz")
+
+scope_data_tree->Draw("t1_a*1e9:track_start_y*1e3>>Vcurve(60,-3,3,100,0,100)","","colz")
+
+scope_data_tree->Draw("tot_a*1e9:t1_a*1e9>>potato_slice(250,0,250,1000,0,1000)","track_start_y>1.225e-3 && track_start_y<1.275e-3","colz")
