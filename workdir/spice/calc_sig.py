@@ -88,9 +88,9 @@ def calc_sig(**kwargs):
   
   spice_delta_t = kwargs.get("spice_delta_t", delta_t)
   spice_sample_width = kwargs.get("spice_sample_width", 400e-9)
-  spice_samples = int(spice_sample_width/delta_t)
+  spice_samples = int(spice_sample_width/spice_delta_t)
   spice_time = np.linspace(0,spice_sample_width,spice_samples)
-  spice_delta_pulse = gauss(spice_time,mu=10e-9,sigma=2*delta_t)
+  spice_delta_pulse = gauss(spice_time,mu=10e-9,sigma=2*spice_delta_t)
   
   dummy, v_cell_ir = apply_network(
         model,

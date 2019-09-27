@@ -64,6 +64,7 @@ def apply_network(simname,sig_in_x,sig_in_y,**kwargs):
     
     
   if os.path.isfile("{:s}.raw".format(simname)): ## raw file already exists
+    print("{:s}.raw already exists ... check its modification date".format(simname))
     # get rawfile modification date
     rawmdate = os.path.getmtime("{:s}.raw".format(simname))
     # get ascfile modification date

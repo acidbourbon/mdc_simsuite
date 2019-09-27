@@ -2,9 +2,11 @@
   "model":"pasttrec_model.asc",
   "configuration": {
     "Z_in":50,
-    "TCR1":27e3,
-    "TCC1":10.5e-12,
-    "TCR2":20e3,
-    "TCC2":0.9e-12
+    "pktime":3.62550326e-08,
+    "TCR1":2.64670964e+04,
+    "TCC1":9.19590282e-12,
+    "TCR2":2.02220270e+04,
+    "TCC2":8.83986110e-13,
+    "gain_correction":7.19626471e-01
   }
 }

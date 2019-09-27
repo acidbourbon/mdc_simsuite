@@ -31,6 +31,9 @@ def resample(target_x,data_x,data_y):
 def normalize(data_y):
   return data_y/sum(data_y)
 
+def normalize_max(data_y):
+  return data_y/max(abs(data_y))
+
 def normalize_dt(data_x,data_y):
   delta_t = data_x[1]-data_x[0]
   return data_y/sum(data_y)/delta_t
@@ -43,6 +46,10 @@ def convolve_dt(x,y1,y2):
   delta_t = x[1]-x[0]
   samples = len(y1)
   return np.convolve(y1,y2*delta_t)[0:samples]
+
+def diff_dt(x,y):
+  delta_t = x[1]-x[0]
+  return np.ediff1d(y,to_end=0)/delta_t
 
 def load_and_resample(filename,target_x,**kwargs):
   dummy = np.loadtxt(filename)
@@ -94,3 +101,12 @@ def write_csv(filename,data_x,data_y):
     for i in range(0,len(data_x)):
       f.write("{:E}\t{:E}\n".format(data_x[i],data_y[i]))
     f.close()
+
+def read_csv(filename):
+  wav = np.loadtxt(filename)
+  x = wav[:,0]
+  y = wav[:,1]
+  return (x,y)
+
+  
+  
