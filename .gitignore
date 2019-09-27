@@ -16,3 +16,4 @@ GAS.txt
 MAGNETIC.txt
 *.root
 workdir/unneccessary_stuff/
+workdir/LTspiceXVII/
