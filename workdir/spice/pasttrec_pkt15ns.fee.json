@@ -7,6 +7,10 @@
     "TCC1":9.19590282e-12,
     "TCR2":2.02220270e+04,
     "TCC2":8.83986110e-13,
-    "gain_correction":7.19626471e-01
+    "gain_correction":7.19626471e-01,
+    "thresh": 15,
+    "thresh_dac_step":1.895e-3,
+    "hysteresis":10e-3,
+    "hyst_offset":-10e-3
   }
 }
