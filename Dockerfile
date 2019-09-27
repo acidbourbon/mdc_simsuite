@@ -77,8 +77,8 @@ RUN apt-get update && \
   iputils-ping \
   curl
 
-RUN pip3 install --upgrade pip && \
-  pip3 install setuptools && \
+RUN pip3 install --upgrade pip
+RUN pip3 install setuptools && \
   pip3 install pythondialog python-vxi11
 
 COPY --from=0 /root-build /root-build 
