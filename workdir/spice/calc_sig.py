@@ -122,8 +122,21 @@ def calc_sig(**kwargs):
   ##         call SPICE, calculate FEE IR         ##
   ##################################################
 
-
-
+  fee_spice_conf = kwargs.get("fee_spice_conf","none")
+  fee_spice_conf_json = get_file_json(fee_spice_conf)
+  fee_configuration = fee_spice_conf_json["configuration"]
+  fee_model         = fee_spice_conf_json["model"]
+  
+  delta_pulse = gauss(time,mu=10e-9,sigma=2*delta_t)
+  
+  dummy, v_fee_ir = apply_network(
+        fee_model,
+        time,delta_pulse,
+        params=fee_configuration
+        )
+  
+  plt.plot(time,v_fee_ir)
+  plt.show()
 
   ##################################################
   ##        calculate avalanche current IR        ##
@@ -137,8 +150,22 @@ def calc_sig(**kwargs):
   ##################################################
  
   ava_c_cell_fft = fft_convolve(time,[i_avalanche,v_cell_ir])
-  dummy, ava_c_cell_fft = shift_time(time, ava_c_cell_fft, -20e-9) ## shift back in time to compensate for the 10 ns offsets in both IRs
+  dummy, ava_c_cell_fft = shift_time(time, ava_c_cell_fft, -20e-9)
+  ## shift back in time to compensate for the 10 ns offsets in both IRs
   
+  ##################################################
+  ##     convolve avalanche, cell and fee IR      ##
+  ##################################################
+  
+  r_term_par = cell_configuration["r_term_par"]
+  i_fee_in = ava_c_cell_fft/float(r_term_par)
+ 
+  ava_c_cell_c_fee_fft = fft_convolve(time,[i_fee_in,v_fee_ir])
+  dummy, ava_c_cell_c_fee_fft = shift_time(time, ava_c_cell_c_fee_fft, -10e-9)
+  ## shift back in time to compensate for the 10 ns offsets in fee ir
+  
+  plt.plot(time,ava_c_cell_c_fee_fft)
+  plt.show()
   
     
   time_ns = time /1e-9
@@ -151,7 +178,7 @@ def calc_sig(**kwargs):
   ##        create signal output rootfile         ##
   ##################################################
     
-  root_out = TFile("../ana_signals.root","RECREATE")
+  root_out = TFile("../cell_ana_signals.root","RECREATE")
   root_out.cd()
   
   # create output root data structure
@@ -249,22 +276,32 @@ def calc_sig(**kwargs):
       
       for w in range(0,2):
         if np.sum(garfield_signal[w]) > 0:
-          ava_c_cell_c_garfield_fft = fft_convolve(time,[ava_c_cell_fft,garfield_signal[w]])
+          v_cell_out        = fft_convolve(time,[ava_c_cell_fft,garfield_signal[w]])
+          v_fee_ana_out     = fft_convolve(time,[ava_c_cell_c_fee_fft,garfield_signal[w]])
           if plot_n_tracks and (processed_tracks <= plot_n_tracks):
-            plt.plot(time_ns,ava_c_cell_c_garfield_fft*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
+            plt.plot(time_ns,v_cell_out*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
             
           ## write to root file
           root_out.cd()
           if (w == 0) and write_analog_waveforms: 
             # only write out waveform for wire 1 (0th array index), the fish partner wire is less important
-            t1_sig_hist = TH1F("t1_sig_{:08d}".format(processed_tracks),"t1_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
-            ana_sig_hist = TH1F("ana_sig_{:08d}".format(processed_tracks),"ana_sig_{:08d}".format(processed_tracks),samples,0,sample_width)
+            t1_sig_hist       = TH1F("t1_sig_{:08d}".format(processed_tracks),
+                                     "t1_sig_{:08d}".format(processed_tracks),
+                                     samples,0,sample_width)
+            cell_ana_sig_hist = TH1F("cell_ana_sig_{:08d}".format(processed_tracks),
+                                     "cell_ana_sig_{:08d}".format(processed_tracks),
+                                     samples,0,sample_width)
+            fee_ana_sig_hist = TH1F("fee_ana_sig_{:08d}".format(processed_tracks),
+                                     "fee_ana_sig_{:08d}".format(processed_tracks),
+                                     samples,0,sample_width)
             for i in range(0,samples):
               t1_sig_hist.SetBinContent(i+1,garfield_signal[w][i])
-              ana_sig_hist.SetBinContent(i+1,ava_c_cell_c_garfield_fft[i])
+              cell_ana_sig_hist.SetBinContent(i+1,v_cell_out[i])
+              fee_ana_sig_hist.SetBinContent(i+1,v_fee_ana_out[i])
               
             t1_sig_hist.Write()
-            ana_sig_hist.Write()
+            cell_ana_sig_hist.Write()
+            fee_ana_sig_hist.Write()
         
           # clear the accumulator vector again
           garfield_signal[w] = np.zeros(len(time)) # clear accumulator
@@ -274,9 +311,9 @@ def calc_sig(**kwargs):
             ##################################################
             ##              send signal to AWG              ##
             ##################################################
-            # ava_c_cell_c_garfield_fft is voltage at parallel resistance
-            r_term_par = configuration["r_term_par"]
-            i_in = ava_c_cell_c_garfield_fft/float(r_term_par)
+            # v_cell_out is voltage at parallel resistance
+            r_term_par = cell_configuration["r_term_par"]
+            i_in = v_cell_out/float(r_term_par)
             # use 50k to convert between AWG voltage to FEE input current
             r_cur_src = 32.8e3
             awg_volt = r_cur_src * i_in
