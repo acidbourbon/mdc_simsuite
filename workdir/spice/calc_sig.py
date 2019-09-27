@@ -61,30 +61,20 @@ def calc_sig(**kwargs):
   
   hit_wire = kwargs.get("hit_wire",1)
 
-  cell_spice_conf = kwargs.get("cell_spice_conf","none")
   
   plot_n_tracks = int(kwargs.get("plot_n_tracks",10))
   plot_alpha_factor = float(kwargs.get("plot_alpha_factor",2))
   plot_alpha = float(kwargs.get("plot_alpha",plot_alpha_factor*1/plot_n_tracks))
   plot_opt = kwargs.get("plot_opt",'b-')
   
-  cell_spice_conf_json = get_file_json(cell_spice_conf)
-  
-  configuration = cell_spice_conf_json["configuration"]
-  model         = cell_spice_conf_json["model"]
   
   
-  
-  ## approximate delta pulse with narrow gaussian at t=10ns
-  #delta_pulse = gauss(time,mu=10e-9,sigma=2*delta_t)
   
   
   
   ##################################################
-  ##           call SPICE, generate IR            ##
+  ##        create short SPICE time vector        ##
   ##################################################
-  
-  ### only process short time sample with SPICE
   
   spice_delta_t = kwargs.get("spice_delta_t", delta_t)
   spice_sample_width = kwargs.get("spice_sample_width", 400e-9)
@@ -92,19 +82,32 @@ def calc_sig(**kwargs):
   spice_time = np.linspace(0,spice_sample_width,spice_samples)
   spice_delta_pulse = gauss(spice_time,mu=10e-9,sigma=2*spice_delta_t)
   
+  
+  
+  ##################################################
+  ##           call SPICE, generate IR            ##
+  ##################################################
+  
+  cell_spice_conf = kwargs.get("cell_spice_conf","none")
+  cell_spice_conf_json = get_file_json(cell_spice_conf)
+  cell_configuration = cell_spice_conf_json["configuration"]
+  cell_model         = cell_spice_conf_json["model"]
+  
   dummy, v_cell_ir = apply_network(
-        model,
+        cell_model,
         spice_time,spice_delta_pulse,
-        params=configuration
+        params=cell_configuration
         )
   
   dummy, v_cell_ir = resample(time,spice_time,v_cell_ir) ## resample from spice time (short sample) to global time (long sample)
 
 
 
+  ##################################################
+  ##        calculate avalanche current IR        ##
+  ##################################################
 
-  ### generate avalanche current response model ###
-  i_avalanche = avalanche_current(time, **configuration) # pass dict configuration as kwargs
+  i_avalanche = avalanche_current(time, **cell_configuration) # pass dict cell_configuration as kwargs
   
   
   ##################################################
@@ -194,7 +197,6 @@ def calc_sig(**kwargs):
     
   
   
-  
   #### load garfield signal ###
   #garfield_x, garfield_y = load_and_resample("00_garfield_signal/Fe55_kernel.csv",time)
   #garfield_y = normalize_dt(garfield_x,garfield_y) # normalize as if we had one charge
@@ -203,7 +205,7 @@ def calc_sig(**kwargs):
   #dummy, i_cell = load_and_resample("02_cell_response_function/ir_current.csv", time)
 
   ### load a measurement ###
-  dummy, v_meas = load_and_resample("meas08_resampled.txt", time, x_offset=-299e-9+40e-9)
+  #dummy, v_meas = load_and_resample("meas08_resampled.txt", time, x_offset=-299e-9+40e-9)
 
 
 

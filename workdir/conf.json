@@ -1,7 +1,7 @@
 {
-  "cell_spice_conf": "MDC1_63cm_1600V_270R_ser_50R_par.cell.json",
+  "cell_spice_conf": "Lena_1750V_0.1R_ser_50R_par.cell.json",
   "drift_options": [
-    "MIP_track.sh"
+    "100_MIPS.sh"
   ],
   "fee_spice_conf": "pasttrec_pkt15ns.fee.json",
   "field_options": [
