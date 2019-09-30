@@ -17,3 +17,5 @@ MAGNETIC.txt
 *.root
 workdir/unneccessary_stuff/
 workdir/LTspiceXVII/
+garfield_in.txt
+*_tmp

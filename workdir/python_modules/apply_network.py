@@ -10,10 +10,19 @@ from shutil import copyfile
 
 def apply_network(simname,sig_in_x,sig_in_y,**kwargs):
   
+  print("processing spice circuit {:s}".format(simname))
+  
+  currentDirectory = os.getcwd()
+  
   verbose = kwargs.get("verbose",False)
   interpol = kwargs.get("interpolate",True)
   
-  
+  # make subfolder
+  subfolder_name = "{:s}_tmp".format(simname)
+  if not(os.path.isdir(subfolder_name)):
+    os.mkdir(subfolder_name)
+  copyfile(simname,subfolder_name+"/"+simname+"_")
+  os.chdir(subfolder_name)
 
   params  = kwargs.get("params",{})
 
@@ -39,48 +48,57 @@ def apply_network(simname,sig_in_x,sig_in_y,**kwargs):
 
   sth_changed = False
 
+    
+  if os.path.isfile("{:s}.raw".format(simname)) and filecmp.cmp(simname+".asc_",simname+".asc") : 
+    #print("{:s}.raw already exists and {:s}.asc has not changed".format(simname,simname))
+    pass
+  else :
+    sth_changed = True
+    copyfile(simname+".asc_",simname+".asc")
+    
   # check if we ran the simulation before with exact same input, can save time
-  if os.path.isfile('sig_in.csv') and filecmp.cmp('sig_in.csv_', 'sig_in.csv') :
-    print("sig_in.csv has not changed")
+  if (sth_changed == False) and os.path.isfile('sig_in.csv') and filecmp.cmp('sig_in.csv_', 'sig_in.csv') :
+    #print("sig_in.csv has not changed")
     #os.remove("sig_in.csv_")
+    pass
   else:
     sth_changed = True
     copyfile('sig_in.csv_', 'sig_in.csv')
     
-  if os.path.isfile('trancmd.txt') and filecmp.cmp('trancmd.txt_', 'trancmd.txt'): 
-    print("trancmd.txt has not changed")
+  if (sth_changed == False) and os.path.isfile('trancmd.txt') and filecmp.cmp('trancmd.txt_', 'trancmd.txt'): 
+    #print("trancmd.txt has not changed")
     #os.remove("trancmd.txt_")
+    pass
   else:
     sth_changed = True
     copyfile('trancmd.txt_', 'trancmd.txt')
     
-  if os.path.isfile('param.txt') and filecmp.cmp('param.txt_','param.txt') : 
-    print("param.txt has not changed")
+  if (sth_changed == False) and os.path.isfile('param.txt') and filecmp.cmp('param.txt_','param.txt') : 
+    #print("param.txt has not changed")
     #os.remove("param.txt_")
-    
+    pass
   else:
     sth_changed = True
     copyfile('param.txt_','param.txt')
     
-    
-  if os.path.isfile("{:s}.raw".format(simname)): ## raw file already exists
-    print("{:s}.raw already exists ... check its modification date".format(simname))
-    # get rawfile modification date
-    rawmdate = os.path.getmtime("{:s}.raw".format(simname))
-    # get ascfile modification date
-    ascmdate = os.path.getmtime("{:s}.asc".format(simname))
-    if ascmdate > rawmdate: # asc file has been modified in the meantime
-      print("{:s}.asc is newer than {:s}.raw".format(simname,simname))
-      sth_changed = True
-    else:
-      print("{:s}.asc is older than {:s}.raw".format(simname,simname))
-  else :
-    sth_changed = True
+  #if os.path.isfile("{:s}.raw".format(simname)): ## raw file already exists
+    #print("{:s}.raw already exists ... check its modification date".format(simname))
+    ## get rawfile modification date
+    #rawmdate = os.path.getmtime("{:s}.raw".format(simname))
+    ## get ascfile modification date
+    #ascmdate = os.path.getmtime("{:s}.asc".format(simname))
+    #if ascmdate > rawmdate: # asc file has been modified in the meantime
+      #print("{:s}.asc is newer than {:s}.raw".format(simname,simname))
+      #sth_changed = True
+    #else:
+      #print("{:s}.asc is older than {:s}.raw".format(simname,simname))
+  #else :
+    #sth_changed = True
 
   # do not execute ltspice if nothing has changed
   if sth_changed:
-    print("executing ./wine_ltspice.sh, saving STDOUT to wine_ltspice.log")
-    os.system("./wine_ltspice.sh {:s}.asc > wine_ltspice.log 2>&1".format(simname))
+    print("executing wine LTspice, saving STDOUT to wine_ltspice.log")
+    os.system("wine /LTspiceXVII/XVIIx64.exe {:s}.asc -Run -b > wine_ltspice.log 2>&1".format(simname))
   else:
     print("input data did not change, reading existing .raw file")
     
@@ -98,6 +116,7 @@ def apply_network(simname,sig_in_x,sig_in_y,**kwargs):
   os.remove("param.txt_")
   os.remove("trancmd.txt_")
   os.remove("sig_in.csv_")
+  os.remove(simname+".asc_")
   
   IR1 = ltr.get_trace("V(vout)")
   x = ltr.get_trace("time") 
@@ -105,6 +124,8 @@ def apply_network(simname,sig_in_x,sig_in_y,**kwargs):
   #  #### the abs() is a quick and dirty fix for some strange sign decoding errors
   vout_x = abs(x.get_wave(0))
   vout_y = IR1.get_wave(0)
+  
+  os.chdir(currentDirectory) ## go back where you came from, i.e. return from temp folder
  
   #  interpolate ltspice output, so you have the same x value spacing as in the input voltage vector
   if interpol:
