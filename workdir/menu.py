@@ -51,7 +51,9 @@ while True:
                  ("10","edit circuit model in LTSpice"),
                  ("12","calc ana. signals from GARFIELD data"),
                  ("  ",""),
-                 ("z","exit")] )
+                 ("z","exit menu"),
+                 ("zz","terminate session/container")
+                 ] )
     #if code == d.OK:
       #mm_tag = tag
 
@@ -135,6 +137,9 @@ while True:
       
     if tag == "z":
       exit()
+
+    if tag == "zz":
+      os.system("tmux kill-session -t main")
     
       
   else:

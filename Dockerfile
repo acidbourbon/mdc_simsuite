@@ -98,14 +98,12 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libgslcblas.so.0.0.0 /usr/lib/libgsl.so.0
 # windows binaries and libraries you'll need
 ADD ./build/LTspiceXVII.tgz /
 
+RUN pip3 install jupyter
+
+RUN apt-get update && \
+  apt-get -y install \
+  tmux
+
 ENV HOME=/workdir
-
-RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh" >entrypoint.sh ; chmod +x entrypoint.sh
-
-RUN echo "cd /workdir/; /bin/bash" >> entrypoint.sh
-
-
+RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; cd /workdir; ./start.sh" >entrypoint.sh ; chmod +x entrypoint.sh
 ENTRYPOINT "/entrypoint.sh"
-
-
-
