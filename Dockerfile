@@ -104,7 +104,8 @@ RUN apt-get update && \
   apt-get -y install \
   tmux
 
-RUN dpkg --add-architecture i386 && apt-get update && apt-get install wine32
+# in case you need that win32 support some time ... seems not important
+#RUN dpkg --add-architecture i386 && apt-get update && apt-get -y install wine32
 
 ENV HOME=/workdir
 RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; export PYTHONPATH=\$PYTHONPATH:/workdir/python_modules;\
