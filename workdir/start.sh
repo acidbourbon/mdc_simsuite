@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 tmux new -d -s main
 
 tmux new-window -t main -n "menu" "./menu.py; clear; echo enter ./menu.py to start menu again ... here is a shell ; /bin/bash"

@@ -47,11 +47,16 @@ def dialog_cell_list():
   d.set_background_title("select a cell")
   
   choices = []
+  
+  for entry in conf.list_dir("./cells",ext=".json"):
+    choices+= [(entry,"",False)]
 
-  for name in conf.list_cells():
-    choices += [(name, "")]
-
-  return d.menu("select a cell:", choices= choices )
+  if len(choices):
+    return d.radiolist("select a cell:", choices= choices )
+  else:
+    d.infobox("no option files in ./cells", width=0, height=0, title="done")
+    time.sleep(2)
+    return "none"
 
 
 def dialog_field_checklist():

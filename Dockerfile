@@ -104,6 +104,9 @@ RUN apt-get update && \
   apt-get -y install \
   tmux
 
+RUN dpkg --add-architecture i386 && apt-get update && apt-get install wine32
+
 ENV HOME=/workdir
-RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; cd /workdir; ./start.sh" >entrypoint.sh ; chmod +x entrypoint.sh
+RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; export PYTHONPATH=\$PYTHONPATH:/workdir/python_modules;\
+ cd /workdir; ./start.sh " >entrypoint.sh ; chmod +x entrypoint.sh
 ENTRYPOINT "/entrypoint.sh"

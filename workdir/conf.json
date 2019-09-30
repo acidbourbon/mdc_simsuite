@@ -1,7 +1,7 @@
 {
   "cell_spice_conf": "Lena_1750V_0.1R_ser_50R_par.cell.json",
   "drift_options": [
-    "100_MIPS.sh"
+    "MIP_track.sh"
   ],
   "fee_spice_conf": "pasttrec_pkt15ns.fee.json",
   "field_options": [
