@@ -6,6 +6,13 @@ import numpy as np
 from scipy import interpolate
 
 
+
+def remove_baseline(y,**kwargs):
+  fraction = kwargs.get("fraction",0.08)
+  # use first 8% of the signal to determine baseline
+  return y - np.mean(y[0:int(len(y)*fraction)])
+
+
 def deltafunc_dt(data_x):
   delta_t = data_x[1]-data_x[0]
   
