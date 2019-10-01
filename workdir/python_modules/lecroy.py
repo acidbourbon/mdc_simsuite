@@ -153,6 +153,9 @@ def set_vdiv(source,vdiv):
   
 def set_voffset(source,offset):
   lecroy.write("{:s}:OFFSET {:e}".format(source,offset))
+  
+def set_trig_source(source):
+  lecroy.write("TRIG_SELECT edge,SR,{:s} ".format(source))
 
 def capture_waveforms(sources,**kwargs):
   
