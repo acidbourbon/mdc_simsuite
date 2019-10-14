@@ -44,6 +44,10 @@ def normalize_max(data_y):
 def normalize_dt(data_x,data_y):
   delta_t = data_x[1]-data_x[0]
   return data_y/sum(data_y)/delta_t
+
+def integrate_dt(data_x,data_y):
+  delta_t = data_x[1]-data_x[0]
+  return np.cumsum(data_y)*delta_t
   
 def convolve(y1,y2):
   samples = len(y1)

@@ -29,6 +29,10 @@ print(inst.ask('*IDN?'))
 
 
 
+def my_float_str(a):
+  return "{:f}".format(a)
+
+
 def set_waveform(channel,data_x,data_y,**kwargs):
   # example set_waveform(1,time,ampl, samples=1024)
 
@@ -64,7 +68,11 @@ def set_waveform(channel,data_x,data_y,**kwargs):
     v_high = abs(kwargs.get("v_range",2.5))
     v_low  = -v_high
     raw_y = y/v_high
+    
+
   
+  #val_str = ",".join(map(str,raw_y))
+      
   val_str = ",".join(map(str,raw_y))
 
   

@@ -107,6 +107,8 @@ RUN apt-get update && \
 # in case you need that win32 support some time ... seems not important
 #RUN dpkg --add-architecture i386 && apt-get update && apt-get -y install wine32
 
+RUN cd /opt; git clone https://github.com/lambdalisue/jupyter-vim-binding
+
 ENV HOME=/workdir
 RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; export PYTHONPATH=\$PYTHONPATH:/workdir/python_modules;\
  cd /workdir; ./start.sh " >entrypoint.sh ; chmod +x entrypoint.sh
