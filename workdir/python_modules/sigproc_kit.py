@@ -119,5 +119,72 @@ def read_csv(filename):
   y = wav[:,1]
   return (x,y)
 
+
+
+
+#+
+#|                                    example of my hystereris definition
+#|
+#|
+#|                                                 XXXXXXX
+#|                                                XX     XX
+#|                                              XXX       XX
+#|                             ^     +-------------------------------------------+
+#|                             |               X            XX
+#|        hysteresis = 10 mV   |              XX thresh = 30 mV
+#|                             |     +-------------------------------------------+   +
+#|                             |             X                XX                     |  hyst_offset = -4 mV
+#|                             v     +-------------------------------------------+   v
+#|                                         XX                   XX
+#|                                        XX                     XX
+#|                                       XX                       XXXX
+#|                                     XXX                            XXXXXXXXX
+#|                                   XXX                                       X XXXXXXXXXXXX XXXX   XXXXXXXXXXXXXX
+#|                              XXXXXX                                                           XXXXX             XXX
+#|
+#|
+#|
+#|
+#|                              +--------------+                  +-------------------+
+#|        discriminator out                    |                  |
+#|                                             +------------------+
+#|
+#+
+
+
+def discriminate(time,y,thresh,hysteresis,hyst_offset):
+  out = np.zeros(len(y))
+  
+  rising_thresh = thresh + hysteresis + hyst_offset
+  falling_thresh = thresh + hyst_offset
+  
+  state = 1
+  t1 = None
+  tot = None
+  
+  for i in range(0,len(y)):
+    v = y[i]
+    
+    if state == 1: 
+      if v > rising_thresh:
+        state = 0
+        if t1 is None:
+          t1 = time[i]
+    else: #state == 0
+      if v < falling_thresh:
+        state = 1
+        if tot is None:
+          tot = time[i] - t1
+    
+    out[i] = state
+    
+  if t1 is None:
+    t1 = -1000
+  if tot is None:
+    tot = -1000
+  return (out, t1, tot)
+    
+
+
   
   

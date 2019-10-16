@@ -113,3 +113,5 @@ ENV HOME=/workdir
 RUN echo "#!/bin/bash\n. /root-build/bin/thisroot.sh; export PYTHONPATH=\$PYTHONPATH:/workdir/python_modules;\
  cd /workdir; ./start.sh " >entrypoint.sh ; chmod +x entrypoint.sh
 ENTRYPOINT "/entrypoint.sh"
+
+RUN pip3 install dill
