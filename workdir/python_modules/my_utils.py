@@ -88,11 +88,22 @@ def show(plt,**kwargs):
 
   plotfile = data_dir+"/{:03d}{:s}".format(plot_counter,ext) 
   print("saving to "+plotfile)
+  picklefile = plotfile.replace(ext,".pickle")
+  print("saving to "+picklefile)
+
+  import pickle
+  fig = plt.gcf()
+  pickle.dump(fig,open(picklefile,'wb'))
+    
   plt.savefig(plotfile)
 
   plt.show()
-  ## also pickle it
+
+
+
+def load_plot_pickle(file):
+  from matplotlib import pyplot as plt
   import pickle
-  fig = plt.gcf()
-  pickle.dump(fig,open(plotfile.replace(ext,".pickle"),'wb'))
+  pickle.load(open(file,"rb"))
+
 
