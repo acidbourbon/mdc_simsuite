@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p $(jupyter --data-dir)/nbextensions
-cp /opt/jupyter_vim_binding $(jupyter --data-dir)/nbextensions/vim_binding
+cp /opt/jupyter-vim-binding $(jupyter --data-dir)/nbextensions/vim_binding -R
 
 #uncomment the following lines if you want vim-bindings in your notebooks
 # jupyter nbextension disable vim_binding/vim_binding

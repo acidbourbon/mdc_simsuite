@@ -1,7 +1,7 @@
 {
   "cell_spice_conf": "Lena_1750V_0.1R_ser_50R_par.cell.json",
   "drift_options": [
-    "MIP_track.sh"
+    "cosy_1000_tracks_fish_y1.25mm.sh"
   ],
   "fee_spice_conf": "pasttrec_pkt15ns.fee.json",
   "field_options": [

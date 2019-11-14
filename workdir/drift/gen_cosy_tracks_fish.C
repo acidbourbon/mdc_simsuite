@@ -44,8 +44,10 @@ void gen_cosy_tracks_fish(){
 Int_t number = from_env_int("number","10");
 
 // convert SI input values (m) to cm (my working unit)
-Float_t displacement_x = 1e2*from_env_float("displacement_x","1.0e-3");
-Float_t displacement_y = 1e2*from_env_float("displacement_y","2.5e-3");
+Float_t displacement_x = 1e2*from_env_float("displacement_x","0");
+Float_t displacement_y = 1e2*from_env_float("displacement_y","0");
+Float_t width_x = 1e2*from_env_float("width_x","1.0e-3");
+Float_t width_y = 1e2*from_env_float("width_y","2.5e-3");
 Float_t z_length = 1e2*from_env_float("z_length","1.6e-2");
 
 Float_t x_min = 1e2*from_env_float("x_min","-0.0035");
@@ -85,8 +87,8 @@ for (Int_t i = 0 ; i< number; i++){
   Float_t dir_z = TMath::Cos(theta);
 //   cout << " dirs " << dir_x << " " << dir_y << " "<< dir_z << endl;
   
-  Float_t x_0 = gRandom->Uniform(-displacement_x,displacement_x);
-  Float_t y_0 = gRandom->Uniform(-displacement_y,displacement_y);
+  Float_t x_0 = gRandom->Uniform(displacement_x-width_x,displacement_x+width_x);
+  Float_t y_0 = gRandom->Uniform(displacement_y-width_y,displacement_y+width_y);
   Float_t z_0 = 0;
   
   Float_t length_a = length/2.;
