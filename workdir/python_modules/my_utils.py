@@ -99,7 +99,17 @@ def show(plt,**kwargs):
 
   plt.show()
 
-
+def pickle_this(this,name):
+  import pickle
+  picklefile = make_data_dir()+"/{:s}.pickle".format(name)
+  print("saving to "+picklefile)
+  pickle.dump(this,open(picklefile,'wb'))
+    
+def unpickle(name):
+  import pickle
+  picklefile = "{:s}".format(name)
+  print("loading from "+picklefile)
+  return pickle.load(open(picklefile,"rb"))
 
 def load_plot_pickle(file):
   from matplotlib import pyplot as plt
