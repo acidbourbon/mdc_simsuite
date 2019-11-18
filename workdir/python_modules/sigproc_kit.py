@@ -157,29 +157,34 @@ def read_csv(filename):
 #+
 
 
-def discriminate(time,y,thresh,hysteresis,hyst_offset):
+def discriminate(time,y,thresh,hysteresis,hyst_offset,**kwargs):
   out = np.zeros(len(y))
   
   rising_thresh = thresh + hysteresis + hyst_offset
   falling_thresh = thresh + hyst_offset
+    
+  start = float(kwargs.get("start",time[0]))
   
   state = 1
   t1 = None
   tot = None
   
   for i in range(0,len(y)):
-    v = y[i]
     
-    if state == 1: 
-      if v > rising_thresh:
-        state = 0
-        if t1 is None:
-          t1 = time[i]
-    else: #state == 0
-      if v < falling_thresh:
-        state = 1
-        if tot is None:
-          tot = time[i] - t1
+    if time[i] >= start:
+          
+      v = y[i]
+    
+      if state == 1: 
+        if v > rising_thresh:
+          state = 0
+          if t1 is None:
+            t1 = time[i]
+      else: #state == 0
+        if v < falling_thresh:
+          state = 1
+          if tot is None:
+            tot = time[i] - t1
     
     out[i] = state
     

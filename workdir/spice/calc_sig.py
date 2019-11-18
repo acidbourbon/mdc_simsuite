@@ -6,6 +6,8 @@ from sigproc_kit import *
 from avalanche_current import *
 from apply_network import apply_network
 
+#from my_utils import *
+
 import sys
 import json
 import os
@@ -15,6 +17,7 @@ from array import array
 import matplotlib.pyplot as plt
 
 import time as time_module
+import pickle
 
 lab_setup = False
 
@@ -52,68 +55,6 @@ def gauss(x, **kwargs):
 
 
 
-#+
-#|                                    example of my hystereris definition
-#|
-#|
-#|                                                 XXXXXXX
-#|                                                XX     XX
-#|                                              XXX       XX
-#|                             ^     +-------------------------------------------+
-#|                             |               X            XX
-#|        hysteresis = 10 mV   |              XX thresh = 30 mV
-#|                             |     +-------------------------------------------+   +
-#|                             |             X                XX                     |  hyst_offset = -4 mV
-#|                             v     +-------------------------------------------+   v
-#|                                         XX                   XX
-#|                                        XX                     XX
-#|                                       XX                       XXXX
-#|                                     XXX                            XXXXXXXXX
-#|                                   XXX                                       X XXXXXXXXXXXX XXXX   XXXXXXXXXXXXXX
-#|                              XXXXXX                                                           XXXXX             XXX
-#|
-#|
-#|
-#|
-#|                              +--------------+                  +-------------------+
-#|        discriminator out                    |                  |
-#|                                             +------------------+
-#|
-#+
-
-
-def discriminate(time,y,thresh,hysteresis,hyst_offset):
-  out = np.zeros(len(y))
-  
-  rising_thresh = thresh + hysteresis + hyst_offset
-  falling_thresh = thresh + hyst_offset
-  
-  state = 1
-  t1 = None
-  tot = None
-  
-  for i in range(0,len(y)):
-    v = y[i]
-    
-    if state == 1: 
-      if v > rising_thresh:
-        state = 0
-        if t1 is None:
-          t1 = time[i]
-    else: #state == 0
-      if v < falling_thresh:
-        state = 1
-        if tot is None:
-          tot = time[i] - t1
-    
-    out[i] = state
-    
-  if t1 is None:
-    t1 = -1000
-  if tot is None:
-    tot = -1000
-  return (out, t1, tot)
-    
 
 
 
@@ -313,6 +254,8 @@ def calc_sig(**kwargs):
   processed_tracks = 0
   evt = -1
   
+  pickle_data_list = []
+  
   for i in range(0,entries+1):
     
     
@@ -346,6 +289,7 @@ def calc_sig(**kwargs):
                                            fee_configuration["hysteresis"],
                                            fee_configuration["hyst_offset"]
                                            )
+          v_fee_discr_out = v_fee_discr_out*0.8 - 0.4 ## mimic LVDS at 100R
           if plot_n_tracks and (processed_tracks <= plot_n_tracks):
             plt.plot(time_ns,v_cell_out*1e3, plot_opt, label="signal {:03d}".format(processed_tracks), alpha=plot_alpha )
             
@@ -353,8 +297,8 @@ def calc_sig(**kwargs):
           root_out.cd()
           if (w == 0) and write_analog_waveforms: 
             # only write out waveform for wire 1 (0th array index), the fish partner wire is less important
-            t1_sig_hist       = TH1F("t1_sig_{:08d}".format(processed_tracks),
-                                     "t1_sig_{:08d}".format(processed_tracks),
+            t1_sig_hist       = TH1F("garfield_sig_{:08d}".format(processed_tracks),
+                                     "garfield_sig_{:08d}".format(processed_tracks),
                                      samples,0,sample_width)
             cell_ana_sig_hist = TH1F("cell_ana_sig_{:08d}".format(processed_tracks),
                                      "cell_ana_sig_{:08d}".format(processed_tracks),
@@ -370,7 +314,19 @@ def calc_sig(**kwargs):
               cell_ana_sig_hist.SetBinContent(i+1,v_cell_out[i])
               fee_ana_sig_hist.SetBinContent(i+1,v_fee_ana_out[i])
               fee_discr_sig_hist.SetBinContent(i+1,v_fee_discr_out[i])
-              
+            
+            pickle_data_list += [ 
+                {
+                  "garfield_signal":garfield_signal.copy(),
+                  "v_cell_out":v_cell_out.copy(),
+                  "v_fee_ana_out":v_fee_ana_out.copy(),
+                  "v_fee_discr_out":v_fee_discr_out.copy(),
+                  "time":time,
+                  "t1":t1.copy(),
+                  "tot":tot.copy()
+                }
+              ]
+            
             t1_sig_hist.Write()
             cell_ana_sig_hist.Write()
             fee_ana_sig_hist.Write()
@@ -482,6 +438,10 @@ def calc_sig(**kwargs):
     
   scope_data_tree.Write()
   root_out.Close()
+  
+  picklefile = "../{:s}.pickle".format("ana_signals")
+  print("saving to "+picklefile)
+  pickle.dump(pickle_data_list,open(picklefile,'wb'))
   
   
 
