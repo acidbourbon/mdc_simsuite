@@ -2,5 +2,5 @@
 
 export DOCKER_ID_USER="acidbourbon"
 docker login
-docker tag mdc_3d_garfield_ubuntu acidbourbon/mdc_3d_garfield
-docker push acidbourbon/mdc_3d_garfield
+docker tag mdc_simsuite acidbourbon/mdc_simsuite
+docker push acidbourbon/mdc_simsuite
