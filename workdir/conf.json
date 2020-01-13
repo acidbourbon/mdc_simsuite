@@ -1,11 +1,12 @@
 {
   "cell_spice_conf": "Lena_1750V_0.1R_ser_50R_par.cell.json",
   "drift_options": [
-    "cosy_1000_tracks_fish_y1.25mm.sh"
+    "MIP_track.sh"
   ],
   "fee_spice_conf": "pasttrec_pkt15ns.fee.json",
   "field_options": [
     "plot_surf_E_cross_section.txt",
+    "view_cell_3d.txt",
     "view_inner_cube_3d.txt"
   ],
   "gas_options": "ar70_co230.txt",

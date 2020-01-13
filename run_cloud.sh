@@ -1,6 +1,7 @@
 #!/bin/bash
 
-
+xhost +si:localuser:$USER
+xhost +si:localuser:root
 
 docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
 --name mdc_simsuite_prebuilt -v $(pwd)/workdir:/workdir \

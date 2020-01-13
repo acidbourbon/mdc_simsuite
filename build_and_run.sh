@@ -1,5 +1,8 @@
 #!/bin/bash
 
+xhost +si:localuser:$USER    
+xhost +si:localuser:root  
+
 name=$(basename $(pwd))
 
 docker build -t $name . || exit
